@@ -1,0 +1,476 @@
+{
+ "schemaVersion": 1,
+ "note": "Paritas exit ladder 40/30/BE/TPmax: oracle Python _ladder_exit (momentum_zone.py, bound sl_first) vs TS simulateLadderExit. legs tanpa fee; slippageBps=0; tanpa kasus gap/DATA_END (divergensi terdokumentasi, diuji test TS murni).",
+ "generatedBy": "python3 research/momentum_zone.py ladder-parity",
+ "cases": [
+  {
+   "name": "sl_plain_long",
+   "side": "LONG",
+   "entry": 100,
+   "sl": 97,
+   "tp1": 105,
+   "tp2": 110,
+   "tpMax": 115,
+   "entryIndex": 0,
+   "intervalMs": 60000,
+   "bars": [
+    {
+     "openTime": 1700000000000,
+     "open": 100,
+     "high": 101,
+     "low": 97,
+     "close": 98.5,
+     "volume": 1.0
+    }
+   ],
+   "legs": [
+    {
+     "frac": 1.0,
+     "price": 97,
+     "kind": "SL"
+    }
+   ],
+   "exitBar": 0,
+   "exitReason": "SL"
+  },
+  {
+   "name": "sl_plain_short",
+   "side": "SHORT",
+   "entry": 100,
+   "sl": 103,
+   "tp1": 95,
+   "tp2": 90,
+   "tpMax": 85,
+   "entryIndex": 0,
+   "intervalMs": 60000,
+   "bars": [
+    {
+     "openTime": 1700000000000,
+     "open": 100,
+     "high": 100.8,
+     "low": 99,
+     "close": 99.5,
+     "volume": 1.0
+    },
+    {
+     "openTime": 1700000060000,
+     "open": 99.5,
+     "high": 103.2,
+     "low": 99,
+     "close": 101,
+     "volume": 1.0
+    }
+   ],
+   "legs": [
+    {
+     "frac": 1.0,
+     "price": 103,
+     "kind": "SL"
+    }
+   ],
+   "exitBar": 1,
+   "exitReason": "SL"
+  },
+  {
+   "name": "tp1_then_sl_long",
+   "side": "LONG",
+   "entry": 100,
+   "sl": 97,
+   "tp1": 105,
+   "tp2": 110,
+   "tpMax": 115,
+   "entryIndex": 0,
+   "intervalMs": 60000,
+   "bars": [
+    {
+     "openTime": 1700000000000,
+     "open": 100,
+     "high": 105,
+     "low": 98,
+     "close": 104,
+     "volume": 1.0
+    },
+    {
+     "openTime": 1700000060000,
+     "open": 104,
+     "high": 104.5,
+     "low": 97,
+     "close": 99,
+     "volume": 1.0
+    }
+   ],
+   "legs": [
+    {
+     "frac": 0.4,
+     "price": 105,
+     "kind": "TP1"
+    },
+    {
+     "frac": 0.6,
+     "price": 97,
+     "kind": "SL"
+    }
+   ],
+   "exitBar": 1,
+   "exitReason": "TP1+SL"
+  },
+  {
+   "name": "tp1_tp2_be_long",
+   "side": "LONG",
+   "entry": 100,
+   "sl": 97,
+   "tp1": 105,
+   "tp2": 110,
+   "tpMax": 115,
+   "entryIndex": 0,
+   "intervalMs": 60000,
+   "bars": [
+    {
+     "openTime": 1700000000000,
+     "open": 100,
+     "high": 110,
+     "low": 98,
+     "close": 108,
+     "volume": 1.0
+    },
+    {
+     "openTime": 1700000060000,
+     "open": 108,
+     "high": 109,
+     "low": 100,
+     "close": 104,
+     "volume": 1.0
+    }
+   ],
+   "legs": [
+    {
+     "frac": 0.4,
+     "price": 105,
+     "kind": "TP1"
+    },
+    {
+     "frac": 0.3,
+     "price": 110,
+     "kind": "TP2"
+    },
+    {
+     "frac": 0.30000000000000004,
+     "price": 100,
+     "kind": "BE"
+    }
+   ],
+   "exitBar": 1,
+   "exitReason": "TP1+TP2+BE"
+  },
+  {
+   "name": "tp1_tp2_be_short",
+   "side": "SHORT",
+   "entry": 100,
+   "sl": 103,
+   "tp1": 95,
+   "tp2": 90,
+   "tpMax": 85,
+   "entryIndex": 0,
+   "intervalMs": 60000,
+   "bars": [
+    {
+     "openTime": 1700000000000,
+     "open": 100,
+     "high": 100.5,
+     "low": 90,
+     "close": 91,
+     "volume": 1.0
+    },
+    {
+     "openTime": 1700000060000,
+     "open": 91,
+     "high": 100.2,
+     "low": 91.5,
+     "close": 94,
+     "volume": 1.0
+    }
+   ],
+   "legs": [
+    {
+     "frac": 0.4,
+     "price": 95,
+     "kind": "TP1"
+    },
+    {
+     "frac": 0.3,
+     "price": 90,
+     "kind": "TP2"
+    },
+    {
+     "frac": 0.30000000000000004,
+     "price": 100,
+     "kind": "BE"
+    }
+   ],
+   "exitBar": 1,
+   "exitReason": "TP1+TP2+BE"
+  },
+  {
+   "name": "tp1_then_tp2_tpmax_long",
+   "side": "LONG",
+   "entry": 100,
+   "sl": 97,
+   "tp1": 105,
+   "tp2": 110,
+   "tpMax": 115,
+   "entryIndex": 0,
+   "intervalMs": 60000,
+   "bars": [
+    {
+     "openTime": 1700000000000,
+     "open": 100,
+     "high": 105,
+     "low": 98,
+     "close": 104,
+     "volume": 1.0
+    },
+    {
+     "openTime": 1700000060000,
+     "open": 104,
+     "high": 115,
+     "low": 106,
+     "close": 112,
+     "volume": 1.0
+    }
+   ],
+   "legs": [
+    {
+     "frac": 0.4,
+     "price": 105,
+     "kind": "TP1"
+    },
+    {
+     "frac": 0.3,
+     "price": 110,
+     "kind": "TP2"
+    },
+    {
+     "frac": 0.30000000000000004,
+     "price": 115,
+     "kind": "TPMAX"
+    }
+   ],
+   "exitBar": 1,
+   "exitReason": "TP1+TP2+TPMAX"
+  },
+  {
+   "name": "three_phase_one_bar_long",
+   "side": "LONG",
+   "entry": 100,
+   "sl": 97,
+   "tp1": 105,
+   "tp2": 110,
+   "tpMax": 115,
+   "entryIndex": 0,
+   "intervalMs": 60000,
+   "bars": [
+    {
+     "openTime": 1700000000000,
+     "open": 100,
+     "high": 115,
+     "low": 98,
+     "close": 112,
+     "volume": 1.0
+    }
+   ],
+   "legs": [
+    {
+     "frac": 0.4,
+     "price": 105,
+     "kind": "TP1"
+    },
+    {
+     "frac": 0.3,
+     "price": 110,
+     "kind": "TP2"
+    },
+    {
+     "frac": 0.30000000000000004,
+     "price": 115,
+     "kind": "TPMAX"
+    }
+   ],
+   "exitBar": 0,
+   "exitReason": "TP1+TP2+TPMAX"
+  },
+  {
+   "name": "three_phase_one_bar_short",
+   "side": "SHORT",
+   "entry": 100,
+   "sl": 103,
+   "tp1": 95,
+   "tp2": 90,
+   "tpMax": 85,
+   "entryIndex": 0,
+   "intervalMs": 60000,
+   "bars": [
+    {
+     "openTime": 1700000000000,
+     "open": 100,
+     "high": 100.9,
+     "low": 85,
+     "close": 86,
+     "volume": 1.0
+    }
+   ],
+   "legs": [
+    {
+     "frac": 0.4,
+     "price": 95,
+     "kind": "TP1"
+    },
+    {
+     "frac": 0.3,
+     "price": 90,
+     "kind": "TP2"
+    },
+    {
+     "frac": 0.30000000000000004,
+     "price": 85,
+     "kind": "TPMAX"
+    }
+   ],
+   "exitBar": 0,
+   "exitReason": "TP1+TP2+TPMAX"
+  },
+  {
+   "name": "sl_first_same_bar_long",
+   "side": "LONG",
+   "entry": 100,
+   "sl": 97,
+   "tp1": 105,
+   "tp2": 110,
+   "tpMax": 115,
+   "entryIndex": 0,
+   "intervalMs": 60000,
+   "bars": [
+    {
+     "openTime": 1700000000000,
+     "open": 100,
+     "high": 110,
+     "low": 97,
+     "close": 99,
+     "volume": 1.0
+    }
+   ],
+   "legs": [
+    {
+     "frac": 1.0,
+     "price": 97,
+     "kind": "SL"
+    }
+   ],
+   "exitBar": 0,
+   "exitReason": "SL"
+  },
+  {
+   "name": "be_next_bar_long",
+   "side": "LONG",
+   "entry": 100,
+   "sl": 97,
+   "tp1": 105,
+   "tp2": 110,
+   "tpMax": 115,
+   "entryIndex": 0,
+   "intervalMs": 60000,
+   "bars": [
+    {
+     "openTime": 1700000000000,
+     "open": 101,
+     "high": 110,
+     "low": 99.5,
+     "close": 108,
+     "volume": 1.0
+    },
+    {
+     "openTime": 1700000060000,
+     "open": 107,
+     "high": 108,
+     "low": 99.9,
+     "close": 104,
+     "volume": 1.0
+    }
+   ],
+   "legs": [
+    {
+     "frac": 0.4,
+     "price": 105,
+     "kind": "TP1"
+    },
+    {
+     "frac": 0.3,
+     "price": 110,
+     "kind": "TP2"
+    },
+    {
+     "frac": 0.30000000000000004,
+     "price": 100,
+     "kind": "BE"
+    }
+   ],
+   "exitBar": 1,
+   "exitReason": "TP1+TP2+BE"
+  },
+  {
+   "name": "tp1_tp2_tpmax_staged_long",
+   "side": "LONG",
+   "entry": 100,
+   "sl": 97,
+   "tp1": 105,
+   "tp2": 110,
+   "tpMax": 115,
+   "entryIndex": 0,
+   "intervalMs": 60000,
+   "bars": [
+    {
+     "openTime": 1700000000000,
+     "open": 100,
+     "high": 105,
+     "low": 98,
+     "close": 104,
+     "volume": 1.0
+    },
+    {
+     "openTime": 1700000060000,
+     "open": 104,
+     "high": 110,
+     "low": 105.5,
+     "close": 108,
+     "volume": 1.0
+    },
+    {
+     "openTime": 1700000120000,
+     "open": 108,
+     "high": 115,
+     "low": 110.5,
+     "close": 112,
+     "volume": 1.0
+    }
+   ],
+   "legs": [
+    {
+     "frac": 0.4,
+     "price": 105,
+     "kind": "TP1"
+    },
+    {
+     "frac": 0.3,
+     "price": 110,
+     "kind": "TP2"
+    },
+    {
+     "frac": 0.30000000000000004,
+     "price": 115,
+     "kind": "TPMAX"
+    }
+   ],
+   "exitBar": 2,
+   "exitReason": "TP1+TP2+TPMAX"
+  }
+ ]
+}

@@ -1,0 +1,20 @@
+{
+  "_comment": "Watchdog SL/TP independen (lapis pengaman ke-2). TIDAK menghitung ulang level: SL/TP dibaca dari algo order yang TERPASANG di Binance (fallback: tabel Position di DB). SL/TP utama TETAP dipasang di Binance \u2014 watchdog hanya mengeksekusi saat harga MENYENTUH level.",
+  "env_file": "/opt/kestrel/.env",
+  "db_path": "/opt/kestrel/data/artatrade.db",
+  "binance_base": "https://fapi.binance.com",
+  "poll_interval_sec": 5.0,
+  "price_source": "LAST",
+  "dry_run": false,
+  "alert_pct": 0.3,
+  "log_file": "/opt/kestrel/watchdog/watchdog.log",
+  "state_file": "/opt/kestrel/watchdog/watchdog_state.json",
+  "monitor_script": "/opt/kestrel/watchdog/monitor_agent.py",
+  "enable_monitor": true,
+  "allowed_symbols": [],
+  "recv_window_ms": 5000,
+  "latency_sink_file": "/opt/kestrel/watchdog/latency.jsonl",
+  "ws_enabled": true,
+  "ws_max_price_age_sec": 3.0,
+  "ws_health_file": "/opt/kestrel/watchdog/ws_health.json"
+}

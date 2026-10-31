@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ArtaTrade — Redesign Preview (terminal style)</title>
+<style>
+  :root{
+    --bg:#fafafa; --panel:#ffffff; --ink:#111111; --dim:#888888; --dim2:#bbbbbb;
+    --line:#e5e5e5; --strip:#111111; --green:#16a34a; --red:#ef4444; --amber:#f59e0b;
+    --mono:ui-monospace,"JetBrains Mono","Roboto Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:12px;line-height:1.45}
+
+  /* ============ HEADER ============ */
+  .hdr{display:flex;align-items:center;justify-content:space-between;background:var(--panel);
+       border-bottom:1px solid var(--line);padding:8px 14px}
+  .hdr .l,.hdr .r{display:flex;align-items:center;gap:14px}
+  .logo{width:22px;height:22px;background:#111;color:#fff;display:flex;align-items:center;
+        justify-content:center;font-size:13px;border-radius:2px}
+  .brand{font-weight:700;font-size:13px}
+  .sub{color:var(--dim);font-size:11px}
+  .live{display:flex;align-items:center;gap:5px;color:var(--dim);font-size:11px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+  .stat{text-align:right}
+  .stat .k{color:var(--dim);font-size:10px;letter-spacing:.03em}
+  .stat .v{font-size:13px;font-weight:700}
+  .pos{color:var(--green)} .neg{color:var(--red)} .neu{color:var(--dim)}
+
+  /* ============ TICKER ROW ============ */
+  .tickers{display:grid;grid-template-columns:repeat(5,1fr);background:var(--panel);
+           border-bottom:1px solid var(--line)}
+  .tk{padding:10px 12px;border-right:1px solid var(--line);position:relative}
+  .tk:last-child{border-right:none}
+  .tk .top{display:flex;align-items:center;gap:7px}
+  .coin{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+        font-size:10px;font-weight:700;color:#fff}
+  .sym{font-weight:700}
+  .px{margin-left:auto;color:var(--dim);font-size:11px}
+  .pnl{font-size:17px;font-weight:700;margin:6px 0 3px}
+  .pos-line{font-size:11px}
+  .pos-line b{font-weight:700}
+  .fresh{color:var(--dim2);font-size:10px;margin-top:2px;letter-spacing:.05em}
+  .strat{color:var(--dim);font-size:10px;margin-top:1px}
+
+  /* ============ MAIN: CHART + SIDE ============ */
+  .main{display:grid;grid-template-columns:1fr 232px;gap:10px;padding:10px}
+  .chart-wrap{background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column}
+  .chart-head{display:flex;align-items:center;gap:10px;padding:7px 10px;border-bottom:1px solid var(--line)}
+  .chart-head .t{font-weight:700}
+  .tfs{display:flex;gap:4px;margin-left:auto}
+  .tf{padding:2px 8px;border:1px solid var(--line);border-radius:3px;font-size:10px;color:var(--dim);cursor:pointer}
+  .tf.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chart-body{position:relative;flex:1;min-height:390px}
+  .chart-body svg{display:block;width:100%;height:100%}
+  .legend{display:flex;gap:14px;padding:6px 10px;border-top:1px solid var(--line);color:var(--dim);font-size:10px}
+  .legend span{display:flex;align-items:center;gap:4px}
+
+  .side{display:flex;flex-direction:column;gap:10px}
+  .panel{background:var(--panel);border:1px solid var(--line)}
+  .p-head{background:var(--strip);color:#fff;font-weight:700;font-size:12px;
+          letter-spacing:.08em;padding:6px 10px}
+  .p-body{padding:10px}
+  .call-state{font-size:23px;font-weight:700;color:var(--amber);letter-spacing:.06em;margin-bottom:10px}
+  .call-state.go{color:var(--green)} .call-state.nogo{color:var(--red)}
+  .mrow{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:11px}
+  .mrow .lab{width:52px}
+  .mrow .bar{flex:1;height:7px;background:#ececec;border-radius:4px;overflow:hidden}
+  .mrow .fill{height:100%;border-radius:4px}
+  .mrow .num{width:34px;text-align:right;color:var(--dim)}
+  .calls-empty{color:var(--dim2);font-size:11px;padding:12px 10px 16px}
+  .call-item{display:flex;gap:8px;padding:7px 10px;border-top:1px solid var(--line);font-size:10.5px}
+  .call-item .tm{color:var(--dim2)}
+
+  /* ============ TABLE ============ */
+  .table-wrap{margin:0 10px 12px;background:var(--panel);border:1px solid var(--line)}
+  .tabs{display:flex;background:var(--strip)}
+  .tab{padding:7px 16px;color:var(--dim2);font-size:11px;letter-spacing:.05em;cursor:pointer}
+  .tab.on{font-weight:700;background:#fff;color:#111}
+  table{width:100%;border-collapse:collapse}
+  thead th{background:#f0f0f0;color:var(--ink);font-size:10px;letter-spacing:.05em;
+           text-align:right;padding:6px 10px;border-bottom:1px solid var(--line)}
+  thead th:first-child,tbody td:first-child{text-align:left}
+  thead th:nth-child(2),tbody td:nth-child(2),
+  thead th:nth-child(3),tbody td:nth-child(3){text-align:left}
+  tbody td{padding:7px 10px;text-align:right;font-size:11px;border-bottom:1px solid var(--line)}
+  tbody tr:last-child td{border-bottom:none}
+  .flat{color:var(--dim2)}
+  .lev{color:var(--dim)}
+  .watermark{color:#e8e8e8;font-size:9px;padding:5px 12px;letter-spacing:.12em}
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<div class="hdr">
+  <div class="l">
+    <div class="logo">&#9889;</div>
+    <div>
+      <div class="brand">ArtaTrade</div>
+      <div class="sub">Live AI trading bot</div>
+    </div>
+    <div class="live"><span class="dot"></span> Live &middot; ARM ON &middot; PAPER</div>
+  </div>
+  <div class="r">
+    <div class="stat"><div class="k">balance</div><div class="v">$1,042.55</div></div>
+    <div class="stat"><div class="k">unrealized</div><div class="v neg">-$12.38</div></div>
+    <div class="stat"><div class="k">realized</div><div class="v pos">+$39.60</div></div>
+    <div class="stat"><div class="k">slots</div><div class="v">5/20</div></div>
+  </div>
+</div>
+
+<!-- ================= TICKER CARDS ================= -->
+<div class="tickers">
+  <div class="tk">
+    <div class="top"><div class="coin" style="background:#f0b90b">B</div><div class="sym">BNBUSDT</div>
+      <div class="px">736.04</div></div>
+    <div class="pnl pos">+$3.12</div>
+    <div class="pos-line"><b class="pos">LONG</b> <span class="neu">20x 0.0031 BNB</span></div>
+    <div class="strat">S-02 Liquidity Sniper</div>
+    <div class="fresh">LIVE</div>
+  </div>
+  <div class="tk">
+    <div class="top"><div class="coin" style="background:#111">C</div><div class="sym">CRVUSDT</div>
+      <div class="px">0.3376</div></div>
+    <div class="pnl neg">-$4.05</div>
+    <div class="pos-line"><b class="neg">SHORT</b> <span class="neu">25x 72.4 CRV</span></div>
+    <div class="strat">S-01 Sweep Reclaim</div>
+    <div class="fresh">LIVE</div>
+  </div>
+  <div class="tk">
+    <div class="top"><div class="coin" style="background:#5b6dd6">M</div><div class="sym">MAGICUSDT</div>
+      <div class="px">0.0778</div></div>
+    <div class="pnl neg">-$1.20</div>
+    <div class="pos-line"><b class="pos">LONG</b> <span class="neu">20x 412.0 MAGIC</span></div>
+    <div class="strat">S-02 Liquidity Sniper</div>
+    <div class="fresh">LIVE</div>
+  </div>
+  <div class="tk">
+    <div class="top"><div class="coin" style="background:#e84142">S</div><div class="sym">STRKUSDT</div>
+      <div class="px">0.0741</div></div>
+    <div class="pnl pos">+$6.40</div>
+    <div class="pos-line"><b class="pos">LONG</b> <span class="neu">25x 1,821 STRK</span></div>
+    <div class="strat">S-02 Liquidity Sniper</div>
+    <div class="fresh">LIVE</div>
+  </div>
+  <div class="tk">
+    <div class="top"><div class="coin" style="background:#2775ca">O</div><div class="sym">OGNUSDT</div>
+      <div class="px">0.0382</div></div>
+    <div class="pnl neg">-$6.65</div>
+    <div class="pos-line"><b class="neg">SHORT</b> <span class="neu">20x 842.0 OGN</span></div>
+    <div class="strat">S-02 Liquidity Sniper</div>
+    <div class="fresh">LATE</div>
+  </div>
+</div>
+
+<!-- ================= CHART + SIDE PANELS ================= -->
+<div class="main">
+  <div class="chart-wrap">
+    <div class="chart-head">
+      <div class="t">BTCUSDT</div>
+      <div class="sub">perp &middot; mark 82,718.0</div>
+      <div class="tfs">
+        <div class="tf">1s</div><div class="tf">1m</div><div class="tf on">5m</div>
+        <div class="tf">15m</div><div class="tf">1H</div>
+      </div>
+    </div>
+    <div class="chart-body">
+      <svg viewBox="0 0 900 390" preserveAspectRatio="none" aria-label="candlestick preview">
+        <!-- grid -->
+        <g stroke="#f0f0f0" stroke-width="1">
+          <line x1="0" y1="65" x2="900" y2="65"/><line x1="0" y1="130" x2="900" y2="130"/>
+          <line x1="0" y1="195" x2="900" y2="195"/><line x1="0" y1="260" x2="900" y2="260"/>
+          <line x1="0" y1="325" x2="900" y2="325"/>
+        </g>
+        <!-- candles: bearish = solid black, bullish = hollow (sesuai referensi) -->
+        <g stroke="#111" stroke-width="1.2">
+          <line x1="40"  y1="210" x2="40"  y2="300"/><rect x="33"  y="235" width="14" height="52" fill="#111"/>
+          <line x1="75"  y1="200" x2="75"  y2="285"/><rect x="68"  y="220" width="14" height="45" fill="none"/>
+          <line x1="110" y1="185" x2="110" y2="270"/><rect x="103" y="205" width="14" height="50" fill="#111"/>
+          <line x1="145" y1="170" x2="145" y2="255"/><rect x="138" y="190" width="14" height="48" fill="none"/>
+          <line x1="180" y1="150" x2="180" y2="240"/><rect x="173" y="172" width="14" height="52" fill="none"/>
+          <line x1="215" y1="140" x2="215" y2="225"/><rect x="208" y="158" width="14" height="50" fill="#111"/>
+          <line x1="250" y1="155" x2="250" y2="245"/><rect x="243" y="175" width="14" height="52" fill="none"/>
+          <line x1="285" y1="135" x2="285" y2="215"/><rect x="278" y="152" width="14" height="46" fill="none"/>
+          <line x1="320" y1="120" x2="320" y2="205"/><rect x="313" y="140" width="14" height="50" fill="#111"/>
+          <line x1="355" y1="135" x2="355" y2="215"/><rect x="348" y="152" width="14" height="46" fill="none"/>
+          <line x1="390" y1="110" x2="390" y2="195"/><rect x="383" y="130" width="14" height="50" fill="none"/>
+          <line x1="425" y1="95"  x2="425" y2="180"/><rect x="418" y="115" width="14" height="48" fill="#111"/>
+          <line x1="460" y1="110" x2="460" y2="195"/><rect x="453" y="130" width="14" height="50" fill="none"/>
+          <line x1="495" y1="90"  x2="495" y2="175"/><rect x="488" y="108" width="14" height="50" fill="none"/>
+          <line x1="530" y1="75"  x2="530" y2="160"/><rect x="523" y="95"  width="14" height="48" fill="#111"/>
+          <line x1="565" y1="90"  x2="565" y2="175"/><rect x="558" y="110" width="14" height="48" fill="none"/>
+          <line x1="600" y1="70"  x2="600" y2="155"/><rect x="593" y="88"  width="14" height="50" fill="none"/>
+          <line x1="635" y1="55"  x2="635" y2="140"/><rect x="628" y="75"  width="14" height="48" fill="#111"/>
+          <line x1="670" y1="70"  x2="670" y2="150"/><rect x="663" y="88"  width="14" height="46" fill="none"/>
+          <line x1="705" y1="50"  x2="705" y2="135"/><rect x="698" y="68"  width="14" height="50" fill="none"/>
+          <line x1="740" y1="35"  x2="740" y2="120"/><rect x="733" y="55"  width="14" height="48" fill="#111"/>
+          <line x1="775" y1="50"  x2="775" y2="135"/><rect x="768" y="68"  width="14" height="50" fill="none"/>
+          <line x1="810" y1="30"  x2="810" y2="115"/><rect x="803" y="48"  width="14" height="50" fill="none"/>
+          <line x1="845" y1="20"  x2="845" y2="105"/><rect x="838" y="38"  width="14" height="50" fill="none"/>
+        </g>
+        <!-- garis harga saat ini -->
+        <line x1="0" y1="58" x2="852" y2="58" stroke="#111" stroke-width="1" stroke-dasharray="5 4"/>
+        <rect x="852" y="47" width="48" height="21" fill="#111"/>
+        <text x="876" y="62" fill="#fff" font-size="11" font-family="monospace" text-anchor="middle">82718.0</text>
+        <text x="12" y="378" fill="#999" font-size="10" font-family="monospace">05:30</text>
+        <text x="220" y="378" fill="#999" font-size="10" font-family="monospace">07:00</text>
+        <text x="430" y="378" fill="#999" font-size="10" font-family="monospace">08:30</text>
+        <text x="640" y="378" fill="#999" font-size="10" font-family="monospace">10:00</text>
+        <!-- label sumbu harga -->
+        <g fill="#999" font-size="10" font-family="monospace" text-anchor="start">
+          <text x="852" y="135">82400</text><text x="852" y="200">82100</text>
+          <text x="852" y="265">81800</text><text x="852" y="330">81500</text>
+        </g>
+      </svg>
+    </div>
+    <div class="legend">
+      <span>&#9632; up</span><span>&#9633; down</span><span>&#9650; buy</span>
+      <span>&#9660; sell</span><span>&#9472; entry</span>
+      <span style="margin-left:auto">SL 82,642.0 &middot; TP 82,832.0 &middot; R:R 1:1.5</span>
+    </div>
+  </div>
+
+  <!-- ============ SIDE: JUDGE + CALLS ============ -->
+  <div class="side">
+    <div class="panel">
+      <div class="p-head">JUDGE</div>
+      <div class="p-body">
+        <div class="call-state">GO</div>
+        <div class="mrow"><div class="lab" style="color:var(--green)">entry</div>
+          <div class="bar"><div class="fill" style="width:70%;background:var(--green)"></div></div>
+          <div class="num">0.70</div></div>
+        <div class="mrow"><div class="lab" style="color:var(--red)">reject</div>
+          <div class="bar"><div class="fill" style="width:30%;background:var(--red)"></div></div>
+          <div class="num">0.30</div></div>
+        <div class="mrow"><div class="lab" style="color:var(--dim)">score</div>
+          <div class="bar"><div class="fill" style="width:67%;background:#111"></div></div>
+          <div class="num">67</div></div>
+        <div class="mrow"><div class="lab" style="color:var(--dim)">knn</div>
+          <div class="bar"><div class="fill" style="width:40%;background:#111"></div></div>
+          <div class="num">0.40</div></div>
+        <div class="mrow"><div class="lab" style="color:var(--dim)">hold</div>
+          <div class="bar"><div class="fill" style="width:22%;background:#111"></div></div>
+          <div class="num">22m</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="p-head">CALLS</div>
+      <div class="call-item"><span class="tm">11:12</span><span>ENS &middot; S-01 SHORT &middot; SL -1.00R</span></div>
+      <div class="call-item"><span class="tm">11:00</span><span>CAKE &middot; S-01 SHORT &middot; SL -1.00R</span></div>
+      <div class="call-item"><span class="tm">10:43</span><span>BILL &middot; S-01 SHORT &middot; SL -1.00R</span></div>
+      <div class="call-item"><span class="tm">09:55</span><span>GTC &middot; S-02 SHORT &middot; SL -1.00R</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TABLE ================= -->
+<div class="table-wrap">
+  <div class="tabs">
+    <div class="tab on">POSITIONS</div><div class="tab">TRADES</div><div class="tab">HISTORY</div>
+    <div class="tab" style="margin-left:auto;color:#777">24H &middot; n=21 &middot; WR 38% &middot; sumR -1.0</div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Market</th><th>Side</th><th>Strategy</th><th>Size</th>
+        <th>Entry</th><th>SL</th><th>Mark</th><th>Unrealized</th><th>R</th><th>Lev</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>BNBUSDT</td><td class="pos">LONG</td><td>S-02 Sniper</td><td>0.0031 BNB</td>
+        <td>736.04</td><td>732.90</td><td>738.12</td><td class="pos">+$3.12</td><td class="pos">+0.42R</td><td class="lev">20x</td></tr>
+      <tr><td>CRVUSDT</td><td class="neg">SHORT</td><td>S-01 Sweep</td><td>72.4 CRV</td>
+        <td>0.3376</td><td>0.3439</td><td>0.3432</td><td class="neg">-$4.05</td><td class="neg">-0.64R</td><td class="lev">25x</td></tr>
+      <tr><td>MAGICUSDT</td><td class="pos">LONG</td><td>S-02 Sniper</td><td>412.0 MAGIC</td>
+        <td>0.0778</td><td>0.0749</td><td>0.0775</td><td class="neg">-$1.20</td><td class="neg">-0.41R</td><td class="lev">20x</td></tr>
+      <tr><td>STRKUSDT</td><td class="pos">LONG</td><td>S-02 Sniper</td><td>1,821 STRK</td>
+        <td>0.0741</td><td>0.0712</td><td>0.0776</td><td class="pos">+$6.40</td><td class="pos">+2.21R</td><td class="lev">25x</td></tr>
+      <tr><td>OGNUSDT</td><td class="neg">SHORT</td><td>S-02 Sniper</td><td>842.0 OGN</td>
+        <td>0.0382</td><td>0.0397</td><td>0.0390</td><td class="neg">-$6.65</td><td class="neg">-0.53R</td><td class="lev">20x</td></tr>
+    </tbody>
+  </table>
+  <div class="watermark">PREVIEW MOCKUP &mdash; DATA CONTOH &mdash; ARTATRADE REDESIGN</div>
+</div>
+
+</body>
+</html>

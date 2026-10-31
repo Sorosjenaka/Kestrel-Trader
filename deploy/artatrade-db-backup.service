@@ -1,0 +1,15 @@
+[Unit]
+Description=ArtaTrade SQLite backup (consistent snapshot + rotation)
+After=artatrade.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/kestrel
+ExecStart=/opt/kestrel/tools/backup-db.sh
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+NoNewPrivileges=true
+PrivateTmp=true

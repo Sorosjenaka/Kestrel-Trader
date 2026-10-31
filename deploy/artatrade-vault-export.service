@@ -1,0 +1,11 @@
+[Unit]
+Description=Export ArtaTrade statistics to local vault (no Git publication)
+
+[Service]
+Type=oneshot
+User=artatrade
+Group=artatrade
+WorkingDirectory=/opt/artatrade
+ExecStart=/usr/bin/node /opt/artatrade/tools/export-vault.mjs
+NoNewPrivileges=true
+PrivateTmp=true

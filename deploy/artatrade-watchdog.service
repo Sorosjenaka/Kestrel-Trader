@@ -1,0 +1,23 @@
+[Unit]
+Description=ArtaTrade independent protective-exit watchdog
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=artatrade
+Group=artatrade
+WorkingDirectory=/opt/artatrade
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 /opt/artatrade/watchdog/watchdog_sltp.py
+Restart=on-failure
+RestartSec=5s
+KillMode=control-group
+TimeoutStopSec=40s
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

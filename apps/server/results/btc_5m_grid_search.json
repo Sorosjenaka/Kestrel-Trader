@@ -1,0 +1,86 @@
+[
+  {
+    "strategyId": "S-03",
+    "strategyName": "Fibonacci Zone 0.5-0.618",
+    "tpMultiplier": 1,
+    "totalTrades": 0,
+    "winRate": 0,
+    "profitFactor": 0,
+    "netPnlUsd": 0,
+    "maxDrawdownUsd": 0,
+    "avgAtr": 121.83487121068327,
+    "status": "FAILED"
+  },
+  {
+    "strategyId": "S-03",
+    "strategyName": "Fibonacci Zone 0.5-0.618",
+    "tpMultiplier": 1.25,
+    "totalTrades": 0,
+    "winRate": 0,
+    "profitFactor": 0,
+    "netPnlUsd": 0,
+    "maxDrawdownUsd": 0,
+    "avgAtr": 121.83487121068327,
+    "status": "FAILED"
+  },
+  {
+    "strategyId": "S-03",
+    "strategyName": "Fibonacci Zone 0.5-0.618",
+    "tpMultiplier": 1.4,
+    "totalTrades": 0,
+    "winRate": 0,
+    "profitFactor": 0,
+    "netPnlUsd": 0,
+    "maxDrawdownUsd": 0,
+    "avgAtr": 121.83487121068327,
+    "status": "FAILED"
+  },
+  {
+    "strategyId": "S-03",
+    "strategyName": "Fibonacci Zone 0.5-0.618",
+    "tpMultiplier": 1.5,
+    "totalTrades": 0,
+    "winRate": 0,
+    "profitFactor": 0,
+    "netPnlUsd": 0,
+    "maxDrawdownUsd": 0,
+    "avgAtr": 121.83487121068327,
+    "status": "FAILED"
+  },
+  {
+    "strategyId": "S-03",
+    "strategyName": "Fibonacci Zone 0.5-0.618",
+    "tpMultiplier": 1.7,
+    "totalTrades": 0,
+    "winRate": 0,
+    "profitFactor": 0,
+    "netPnlUsd": 0,
+    "maxDrawdownUsd": 0,
+    "avgAtr": 121.83487121068327,
+    "status": "FAILED"
+  },
+  {
+    "strategyId": "S-03",
+    "strategyName": "Fibonacci Zone 0.5-0.618",
+    "tpMultiplier": 1.9,
+    "totalTrades": 0,
+    "winRate": 0,
+    "profitFactor": 0,
+    "netPnlUsd": 0,
+    "maxDrawdownUsd": 0,
+    "avgAtr": 121.83487121068327,
+    "status": "FAILED"
+  },
+  {
+    "strategyId": "S-03",
+    "strategyName": "Fibonacci Zone 0.5-0.618",
+    "tpMultiplier": 2,
+    "totalTrades": 0,
+    "winRate": 0,
+    "profitFactor": 0,
+    "netPnlUsd": 0,
+    "maxDrawdownUsd": 0,
+    "avgAtr": 121.83487121068327,
+    "status": "FAILED"
+  }
+]

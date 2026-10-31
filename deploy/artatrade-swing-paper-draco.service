@@ -1,0 +1,23 @@
+[Unit]
+Description=ArtaTrade isolated PAPER study - Draco (RSW-03)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/kestrel
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node /opt/kestrel/tools/run-swing-research-paper.mjs --strategy RSW-03 --port 8794 --state /opt/kestrel/data/swing-paper-runtime/forward-wallet-RSW-03.json
+Restart=always
+RestartSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=read-only
+ProtectSystem=full
+ReadWritePaths=/opt/kestrel/data/swing-paper-runtime
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

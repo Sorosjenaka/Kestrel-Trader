@@ -1,0 +1,24 @@
+[Unit]
+Description=ArtaTrade swing forward paper worker (research-only, isolated, no credentials)
+Documentation=docs/FORWARD_PAPER_TIGA_SWING_2026-10-18.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/kestrel
+Environment=PYTHONUNBUFFERED=1
+# Isolated: runner hanya mewariskan PATH/TMP ke child, tanpa kredensial exchange/LLM.
+ExecStart=/usr/bin/node /opt/kestrel/tools/run-swing-research-paper.mjs
+Restart=always
+RestartSec=10s
+KillMode=control-group
+TimeoutStopSec=20s
+ProtectSystem=full
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

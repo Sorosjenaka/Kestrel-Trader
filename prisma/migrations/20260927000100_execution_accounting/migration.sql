@@ -1,0 +1,17 @@
+ALTER TABLE "Position" ADD COLUMN "originalQty" REAL;
+ALTER TABLE "Position" ADD COLUMN "originalSlPrice" REAL;
+ALTER TABLE "Position" ADD COLUMN "originalRiskUsd" REAL;
+ALTER TABLE "Position" ADD COLUMN "entryFeeUsd" REAL;
+ALTER TABLE "Position" ADD COLUMN "quantityStep" REAL;
+ALTER TABLE "Position" ADD COLUMN "priceTick" REAL;
+ALTER TABLE "Position" ADD COLUMN "mfePrice" REAL;
+ALTER TABLE "Position" ADD COLUMN "maePrice" REAL;
+ALTER TABLE "Position" ADD COLUMN "accountingVersion" INTEGER;
+ALTER TABLE "Position" ADD COLUMN "exitAccounting" TEXT;
+ALTER TABLE "OrderExec" ADD COLUMN "filledQty" REAL;
+ALTER TABLE "OrderExec" ADD COLUMN "feeEstimated" BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE "OrderExec" ADD COLUMN "simulated" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "Trade" ADD COLUMN "accountingQuality" TEXT NOT NULL DEFAULT 'LEGACY';
+ALTER TABLE "Trade" ADD COLUMN "fundingVerified" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "Trade" ADD COLUMN "excursionsVerified" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "Position" ADD COLUMN "entryFeeEstimated" BOOLEAN;

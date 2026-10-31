@@ -1,0 +1,34 @@
+{
+  "name": "@artatrade/server",
+  "version": "0.1.3",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "dev:scalp": "tsx watch src/index.ts --mode=SCALP",
+    "dev:swing": "tsx watch src/index.ts --mode=SWING",
+    "dev:both": "tsx watch src/index.ts --mode=BOTH",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "dotenv": "^18.0.3",
+    "express": "^5.2.1",
+    "node-cron": "^4.6.0",
+    "pino": "^10.3.1",
+    "ws": "^8.21.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.2",
+    "@types/supertest": "^7.2.1",
+    "@types/ws": "^8.18.1",
+    "prisma": "^6.19.3",
+    "supertest": "^7.3.0",
+    "tsx": "^4.23.15",
+    "vitest": "^5.0.1"
+  }
+}

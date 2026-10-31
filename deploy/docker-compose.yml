@@ -1,0 +1,38 @@
+# Opsional (T-17). Jalankan dari root repo: docker compose -f deploy/docker-compose.yml up -d
+# ARM live TIDAK diubah oleh compose ini; env tetap dari ../.env (PAPER default).
+services:
+  artatrade:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    env_file: ../.env
+    # Bind ke localhost saja: Docker mem-publish port lewat iptables yang
+    # MELEWATI UFW. Nginx di host yang menjadi gerbang publik.
+    ports:
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - ../data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8787/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  watchdog:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ..:/app
+    command: ["python3", "watchdog/watchdog_sltp.py"]
+    restart: unless-stopped
+    depends_on:
+      - artatrade
+
+  swing-paper:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ..:/app
+    command: ["python3", "research/swing_forward_paper.py"]
+    restart: unless-stopped

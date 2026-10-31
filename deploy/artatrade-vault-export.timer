@@ -1,0 +1,10 @@
+[Unit]
+Description=Hourly local ArtaTrade vault export
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+Unit=artatrade-vault-export.service
+
+[Install]
+WantedBy=timers.target

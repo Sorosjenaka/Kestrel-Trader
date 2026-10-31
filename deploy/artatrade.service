@@ -1,0 +1,32 @@
+[Unit]
+Description=ArtaTrade AI Trading Engine Service (Production)
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=artatrade
+Group=artatrade
+WorkingDirectory=/opt/artatrade
+Environment=NODE_ENV=production
+EnvironmentFile=/opt/artatrade/.env
+ExecStart=/usr/bin/node /opt/artatrade/apps/server/dist/index.js
+Restart=always
+RestartSec=5s
+KillMode=control-group
+TimeoutStopSec=30s
+LimitNOFILE=65536
+
+# Isolasi Keamanan Hardening
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Log output dikirim ke systemd journal
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=artatrade-server
+
+[Install]
+WantedBy=multi-user.target

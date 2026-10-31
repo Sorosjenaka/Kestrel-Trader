@@ -1,0 +1,101 @@
+# Dependencies & build
+node_modules/
+dist/
+.vite/
+
+# Secrets - JANGAN pernah di-commit
+.env
+.env.local
+.env.*
+!.env.example
+!.env.production.example
+apps/*/.env
+apps/*/.env.local
+apps/*/.env.*
+!apps/*/.env.example
+!*.env.example
+
+# Data & log — DB besar & backup lokal TIDAK masuk git; hanya ekspor kecil (data/exports) yang disimpan
+data/*
+!data/exports/
+# Artefak berat (diputuskan operator 9 Okt 2026): kline mentah, dataset lokal,
+# backup build dist.bak-* — tetap di disk, jangan masuk git/GitHub.
+apps/server/data/
+scripts/data/
+dist.bak-*/
+!data/exports/**
+
+# Artefak backtest (bisa di-regenerate lewat tools/run-strategy-batch-backtests.ts
+# + tools/aggregate-bkt.mjs) — jangan masuk version control.
+bkt-*.json
+bkt-report*.json
+logs/
+.logs/
+*.log
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+# Backup DB lokal (26 Okt 2026): salinan database + sidecar SQLite — jangan
+# pernah masuk git/GitHub (berisi data database).
+backups/
+
+# Scratch & backup
+.backup/
+scratch/
+
+# Backup pra-edit per-sesi (24 Okt 2026) — suffix .bak-<timestamp>.
+# Dipakai sebagai jaring pengaman saat refactor; tidak pernah di-import,
+# hanya disimpan di disk sampai operator atau sweep bersih-bersih membersihkannya.
+*.bak-*
+
+# Artefak riset Python & runtime watchdog (19 Okt 2026)
+__pycache__/
+watchdog/latency.jsonl
+watchdog/ws_health.json
+
+# OS
+.DS_Store
+Thumbs.db
+# CP-3/CP-5 (19 Okt 2026): venv & artefak generated harness vectorbt/katalog
+research/.venv-vbt/
+research/vbt/out/
+research/data/rsw-parity/vbt-*.json
+data/catalog/
+
+# Artefak riset hasil Generate (20 Okt 2026, audit AU5-07):
+# research/out/ = 242 MB artefak harness (master ledger 41 MB json + 4 MB
+# parquet + cache bar + script agent). Semua bisa di-regenerate, dan ledger
+# lama berstatus QUARANTINE (bug align H1/H4 features S-05) — JANGAN masuk
+# version control dan jangan dipakai sebagai dasar keputusan sebelum ledger
+# diregenerasi & diverifikasi. Laporan audit .md tetap boleh masuk git.
+research/out/master/
+research/out/master_v2/
+research/out/bars*/
+research/out/agents/*
+!research/out/agents/*.md
+# Artefak test-run lokal (pola data/* di atas hanya menutup data/ di root)
+apps/data/test-runs/
+# Probe audit sementara di root repo (audit AU5-19)
+.au*.ts
+
+# Release snapshot (P5)
+.release-backup-*.tgz
+
+# Artefak Windows & media (tidak dipakai di VPS Linux)
+*.ps1
+video_walkthrough.html
+
+# Backup docs lama yang superseded
+BakcupStrategiV1.md
+
+# Artefak berat yang terdeteksi audit 25 Okt 2026 — jangan masuk git.
+# (bukan kode; bisa di-regenerate / hanya cache & log runtime)
+.cache/
+apps/server/dist.old-*/
+watchdog/watchdog.log*
+# Data bar hasil regenerasi — BERBEDA dari apps/server/tests/fixtures/ yang
+# dipakai test dan sudah tracked. Yang ini tidak di-import kode mana pun.
+apps/server/fixtures/
+docs/design/redesign-b/prototype/site/assets/vendor/
+docs/design/redesign-b/screenshots/

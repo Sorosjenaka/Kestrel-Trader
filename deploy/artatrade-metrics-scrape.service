@@ -1,0 +1,12 @@
+[Unit]
+Description=ArtaTrade metrics snapshot
+After=artatrade.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/kestrel
+ExecStart=/opt/kestrel/tools/scrape-metrics.sh
+NoNewPrivileges=true
+PrivateTmp=true

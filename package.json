@@ -1,0 +1,29 @@
+{
+  "name": "artatrade-ai",
+  "version": "0.1.3",
+  "private": true,
+  "description": "Private Trade AI - bot trading otomatis Binance USDT-M Futures + dashboard 12 agen LLM",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "paper:swing:research": "node tools/run-swing-research-paper.mjs",
+    "dev:server": "npm run dev --workspace apps/server",
+    "dev:web": "npm run dev --workspace apps/web",
+    "dev:local": "node tools/start-local.mjs",
+    "start:scalp": "npm run dev:scalp --workspace apps/server",
+    "start:swing": "npm run dev:swing --workspace apps/server",
+    "start:both": "npm run dev:both --workspace apps/server",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "db:reset-trades": "tsx tools/reset-trades.ts",
+    "health": "curl -s http://localhost:8787/api/health"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

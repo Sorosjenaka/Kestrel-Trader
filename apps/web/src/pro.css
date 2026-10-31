@@ -1,0 +1,763 @@
+/* =============================================================================
+   ArtaTrade Terminal — pro.css (23 Okt 2026, Tahap 8)
+   Layer desain profesional. Dimuat SETELAH index.css sehingga menimpanya.
+
+   Prinsip:
+   - Latar benar-benar pekat (#000) supaya data & chart adalah fokus.
+   - 3 tingkat teks, bukan 8 warna acak.
+   - Angka tabular rata kanan; label kapital kecil dengan tracking long.
+   - Status = warna + ikon + teks (bukan warna saja).
+   - Fokus keyboard selalu terlihat.
+   - prefers-reduced-motion dihormati.
+   ========================================================================== */
+
+/* ── 0. Token (menimpa :root kedua di index.css) ─────────────────────── */
+/*
+   index.css punya DUA blok :root. Yang kedua (baris ~288, "candlestick
+   workspace") overriding palet lama. Karena pro.css dimuat belakangan,
+   blok di bawah yang menang untuk token yang didefinisikan di sini.
+
+   YANG SENGAJA TIDAK DI-UBAH: --paper, --ink, --plot, --note-lavender,
+   --note-green, --market-cyan, --accent-lime, --positive. Itu palet chart
+   Terminal (krem/terang) yang memang dipakai chart & inspector — merapikan
+   panel luar tidak boleh merusak keterbacaan chart.
+*/
+:root {
+  --canvas: #04050F;
+  --surface: #080A17;
+  --surface-raised: #0C0E1E;
+  --surface-hover: #111427;
+  --surface-active: #111427;
+  --border: #161727;
+  --border-strong: #262A44;
+  --border-focus: #3AA8F2;
+  --text-secondary: #97A7D0;
+  --up: #3AA8F2;
+  --up-dim: rgba(58, 168, 242, 0.13);
+  --down: #F2414A;
+  --down-dim: rgba(242, 65, 74, 0.13);
+  --warn: #D0628A;
+  --warn-dim: rgba(208, 98, 138, 0.13);
+  --info: #3AA8F2;
+  --info-dim: rgba(58, 168, 242, 0.13);
+  --accent: #E0222C;
+  --accent-dim: rgba(224, 34, 44, 0.14);
+  --accent-border: rgba(224, 34, 44, 0.34);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+}
+
+/* ── 1. Reset & dasar ─────────────────────────────────────────────────── */
+html, body, #root { height: 100%; }
+
+html { background: var(--canvas); }
+
+body {
+  background: var(--canvas);
+  color: var(--text);
+  font-family: var(--font-main);
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Semua angka: tabular agar kolom sejajar. */
+.num, .mono, table td, table th,
+.metric-value, .terminal-price, .chart-panel-meta,
+.window-delta, .window-stats dd, .inspector-levels b,
+.workspace-table td, .position-strip-table td,
+.market-table td, .agent-table td {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+::selection { background: rgba(58, 168, 242, 0.30); color: #fff; }
+
+/* Scrollbar tipis & tak mengganggu. */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #161727; border-radius: 4px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: #262A44; background-clip: padding-box; }
+* { scrollbar-width: thin; scrollbar-color: #161727 transparent; }
+
+/* Fokus keyboard: WAJIB terlihat, tidak dihapus. */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+:focus:not(:focus-visible) { outline: none; }
+
+/* ── 2. Shell & topbar ────────────────────────────────────────────────── */
+.app-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(224, 34, 44, 0.04), transparent 60%),
+    radial-gradient(900px 500px at 90% 0%, rgba(58, 168, 242, 0.035), transparent 55%),
+    var(--canvas);
+}
+
+.topbar {
+  position: sticky; top: 0; z-index: var(--z-sticky);
+  height: 56px; display: flex; align-items: stretch; gap: 20px;
+  padding: 0 20px;
+  /* 24 Okt 2026 — performa: blur(14px) di topbar sticky memaksa GPU
+     re-composite seluruh viewport pada SETIAP frame (canvas microstructure
+     terus berubah di bawahnya) — penyebab utama jank. Diganti latar pekat:
+     tampilan hampir sama, biaya render jauh lebih murah. */
+  background: #06070b;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.brand { display: flex; align-items: center; gap: 11px; min-width: 196px; color: var(--text); text-decoration: none; }
+.brand-mark {
+  width: 30px; height: 30px; flex: 0 0 30px;
+  display: grid; place-items: center;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #111427, #080A17);
+  border: 1px solid var(--border-strong);
+  color: var(--accent);
+  font-weight: 800; font-size: 14px;
+  letter-spacing: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.brand-name { font-size: 12.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text); }
+.brand-sub { color: var(--text-muted); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; margin-top: 1px; }
+
+.nav { display: flex; align-items: stretch; gap: 2px; flex: 1; overflow-x: auto; scrollbar-width: none; }
+.nav::-webkit-scrollbar { display: none; }
+.nav-tab {
+  display: inline-flex; align-items: center;
+  padding: 0 14px;
+  color: var(--text-secondary);
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  text-decoration: none; white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color var(--t-fast), background var(--t-fast), border-color var(--t-fast);
+}
+.nav-tab:hover { color: var(--text); background: rgba(255, 255, 255, 0.035); }
+.nav-tab.active {
+  color: #fff; background: var(--accent-dim);
+  border-bottom-color: var(--accent);
+  border-radius: 7px 7px 0 0;
+  margin-bottom: -1px;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+
+.search-box {
+  display: flex; align-items: center; gap: 7px;
+  height: 30px; padding: 0 10px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--t-fast);
+}
+.search-box:focus-within { border-color: var(--border-focus); }
+.search-box input {
+  width: 120px; border: 0; outline: 0; background: transparent;
+  color: var(--text); font-size: 12px; font-family: var(--font-mono);
+}
+.search-box input::placeholder { color: var(--text-muted); }
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 26px; padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill, 999px);
+  font-size: 10.5px; font-weight: 650; letter-spacing: 0.07em; text-transform: uppercase;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  background: var(--surface-raised);
+}
+.status-pill.good { color: var(--up); border-color: rgba(58, 168, 242, 0.32); background: var(--up-dim); }
+.status-pill.warn { color: var(--warn); border-color: rgba(208, 98, 138, 0.32); background: var(--warn-dim); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: 0 0 6px; }
+
+.clock { color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.02em; white-space: nowrap; }
+
+.gear {
+  width: 30px; height: 30px; display: grid; place-items: center;
+  background: var(--surface-raised); color: var(--text-secondary);
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  cursor: pointer; transition: all var(--t-fast);
+}
+.gear:hover { color: var(--text); border-color: var(--border-strong); background: var(--surface-hover); }
+
+/* ── 3. Layout halaman ────────────────────────────────────────────────── */
+.main { padding: 18px 22px 44px; max-width: 1720px; margin: 0 auto; }
+.page { display: flex; flex-direction: column; gap: 14px; }
+
+/* ── 4. Panel & kartu ─────────────────────────────────────────────────── */
+.panel, .metric-strip, .workspace-ledger, .agent-card, .market-table-wrap,
+.workspace-main > *, .terminal-page > * {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.metric-strip {
+  display: grid; grid-template-columns: 1.35fr 1fr 1fr 1fr;
+  gap: 1px; overflow: hidden; background: var(--border);
+}
+.metric-strip > div { background: var(--surface); padding: 13px 16px; min-width: 0; }
+.metric-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 5px;
+}
+.metric-value {
+  font-family: var(--font-mono); font-size: 19px; font-weight: 600;
+  color: var(--text); line-height: 1.2; letter-spacing: -0.02em;
+}
+.metric-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; }
+
+/* ── 5. Tipografi utilitas ────────────────────────────────────────────── */
+.eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-muted);
+}
+.mono { font-family: var(--font-mono); }
+.muted { color: var(--text-muted); }
+.tiny { font-size: 11px; }
+.up, .positive { color: var(--up); }
+.down, .negative { color: var(--down); }
+.warn { color: var(--warn); }
+.accent { color: var(--accent); }
+
+/* ── 6. Tabel data ────────────────────────────────────────────────────── */
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+thead th {
+  position: sticky; top: 0; z-index: 2;
+  padding: 9px 12px;
+  text-align: left;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border-strong);
+  white-space: nowrap;
+}
+tbody td {
+  padding: 9px 12px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr { transition: background var(--t-fast); }
+tbody tr:hover { background: var(--surface-hover); }
+tbody tr:last-child td { border-bottom: none; }
+td.num, th.num { text-align: right; font-family: var(--font-mono); }
+td.reason-cell {
+  white-space: normal; max-width: 460px; color: var(--text-secondary);
+  font-family: var(--font-main); font-size: 12px; line-height: 1.45;
+}
+
+/* ── 7. Tombol ────────────────────────────────────────────────────────── */
+button {
+  font: inherit; cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.05em;
+  transition: all var(--t-fast);
+}
+button:hover:not(:disabled) { color: var(--text); border-color: var(--border-strong); background: var(--surface-hover); }
+button:active:not(:disabled) { transform: translateY(0.5px); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.primary {
+  background: var(--accent); border-color: var(--accent); color: #04101f; font-weight: 700;
+}
+button.primary:hover:not(:disabled) { background: #E0222C; border-color: #E0222C; color: #fff; }
+button.danger { color: var(--down); border-color: rgba(242, 65, 74, 0.35); background: var(--down-dim); }
+button.danger:hover:not(:disabled) { background: rgba(242, 65, 74, 0.2); color: #F2414A; }
+button.ghost { background: transparent; }
+
+.workspace-ghost {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em;
+  padding: 5px 11px; border-radius: var(--radius-md);
+  transition: all var(--t-fast);
+}
+.workspace-ghost:hover:not(:disabled) { color: var(--text); border-color: var(--border-strong); background: var(--surface-hover); }
+
+/* ── 8. Form ──────────────────────────────────────────────────────────── */
+input, select, textarea {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  padding: 6px 10px;
+  font-size: 12.5px;
+  transition: border-color var(--t-fast);
+}
+input:focus, select:focus, textarea:focus { border-color: var(--border-focus); outline: none; }
+select { cursor: pointer; }
+.inline-select {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-muted);
+}
+.inline-select select {
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0;
+  text-transform: none; color: var(--text); padding: 5px 9px;
+}
+
+/* ── 9. Tabs ──────────────────────────────────────────────────────────── */
+.ledger-tabs, .tab-content { position: relative; }
+.ledger-tabs {
+  display: flex; gap: 2px; padding: 0 6px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  overflow-x: auto; scrollbar-width: none;
+}
+.ledger-tabs::-webkit-scrollbar { display: none; }
+.ledger-tabs button {
+  background: transparent; border: none; border-bottom: 2px solid transparent;
+  border-radius: 0; padding: 11px 13px;
+  color: var(--text-muted); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  white-space: nowrap; transition: all var(--t-fast);
+}
+.ledger-tabs button:hover { color: var(--text); background: rgba(255, 255, 255, 0.03); }
+.ledger-tabs button.active { color: var(--text); border-bottom-color: var(--accent); }
+.ledger-body { padding: 0; }
+.ledger-foot {
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 9px 14px;
+  border-top: 1px solid var(--border);
+  font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-muted); font-family: var(--font-mono);
+}
+
+/* ── 10. Badge & status ───────────────────────────────────────────────── */
+.side-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 7px; border-radius: var(--radius-sm);
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+}
+.side-badge.long { color: var(--up); background: var(--up-dim); }
+.side-badge.short { color: var(--down); background: var(--down-dim); }
+
+.context-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 23px; padding: 0 9px;
+  border-radius: var(--radius-pill, 999px);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 600;
+  letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface-raised);
+}
+.context-pill.market { color: var(--info); border-color: rgba(58, 168, 242, 0.3); }
+.context-pill.paper { color: var(--warn); border-color: rgba(208, 98, 138, 0.3); }
+.context-pill.locked { color: var(--text-muted); }
+.context-pill i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; animation: pulse-dot 2s ease-in-out infinite; }
+
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ── 11. Empty / loading state ────────────────────────────────────────── */
+.ledger-empty, .position-strip-empty, .inspector-empty, .agent-empty, .empty-line {
+  padding: 26px 18px; text-align: center;
+  color: var(--text-muted); font-size: 12.5px; line-height: 1.6;
+  background: repeating-linear-gradient(-45deg, transparent, transparent 9px, rgba(255, 255, 255, 0.012) 9px, rgba(255, 255, 255, 0.012) 10px);
+  border-radius: var(--radius-md);
+}
+
+/* ── 12. Terminal workspace ───────────────────────────────────────────── */
+.workspace-page { display: flex; flex-direction: column; gap: 12px; }
+
+.workspace-context {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  padding: 11px 15px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.workspace-context-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.workspace-context-right { display: flex; align-items: center; gap: 10px; }
+.workspace-mark {
+  width: 28px; height: 28px; display: grid; place-items: center;
+  border-radius: 7px; background: var(--accent-dim);
+  border: 1px solid var(--accent-border); color: var(--accent);
+  font-weight: 800; font-size: 13px;
+}
+.workspace-title { font-size: 12.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text); }
+.workspace-sub { font-size: 9.5px; letter-spacing: 0.1em; color: var(--text-muted); font-family: var(--font-mono); margin-top: 1px; }
+
+.workspace-toolbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 9px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+.workspace-toolbar-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.workspace-muted { font-size: 10.5px; font-family: var(--font-mono); color: var(--text-muted); letter-spacing: 0.05em; }
+
+.layout-switch { display: inline-flex; gap: 1px; padding: 2px; background: var(--surface-raised); border: 1px solid var(--border); border-radius: var(--radius-md); }
+.layout-switch button {
+  background: transparent; border: none; padding: 4px 10px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+  color: var(--text-muted); border-radius: 4px;
+}
+.layout-switch button.active { background: var(--accent-dim); color: var(--accent); }
+
+.workspace-main {
+  display: grid; grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 12px; align-items: start;
+}
+.workspace-main.one { grid-template-columns: minmax(0, 1fr) 340px; }
+@media (max-width: 1280px) {
+  .workspace-main, .workspace-main.one { grid-template-columns: minmax(0, 1fr); }
+}
+.workspace-chart-stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
+.chart-grid { display: grid; gap: 10px; grid-template-columns: 1fr; }
+.chart-grid:has(.chart-panel-wrap:nth-child(4)) { }
+.workspace-main.four .chart-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.workspace-main.eight .chart-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.chart-panel-wrap {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--t-fast);
+}
+.chart-panel-wrap:hover { border-color: var(--border-strong); }
+.chart-panel-wrap.single { min-height: 520px; }
+.grid-index {
+  position: absolute; top: 8px; right: 10px;
+  font-family: var(--font-mono); font-size: 9px; color: var(--text-muted);
+  letter-spacing: 0.1em; pointer-events: none;
+}
+
+/* ── 13. Inspector ────────────────────────────────────────────────────── */
+/*
+   23 Okt 2026 (rollback operator): blok inspektur di bawah dikembalikan ke
+   palet KREM/TERANG milik index.css (HEAD). Panel "POSISI PAPER TERPILIH"
+   memakai kartu kertas seperti slip order; palet gelap professional membuatnya
+   kehilangan hierarki dan tercampur dengan panel lain. Yang dikembalikan:
+   latar kertas, teks tinta, border, dan warna status lifecycle.
+   PENTING: --paper/--ink/--note-lavender/--note-green sengaja TIDAK diubah
+   di blok token pro.css — palet itu milik chart & slip order.
+*/
+.workspace-inspector { display: flex; flex-direction: column; gap: 10px; min-width: 0; position: sticky; top: 64px; }
+.inspector-paper {
+  background: var(--paper); color: var(--ink);
+  border: 1px solid #d8d0c1; border-radius: 4px; padding: 13px;
+}
+.inspector-paper .paper-top {
+  display: flex; justify-content: space-between; gap: 8px; color: #5d564a;
+  font: 8px var(--font-mono); border-bottom: 1px solid #d8d0c1;
+  padding-bottom: 7px; margin-bottom: 10px;
+}
+.inspector-kicker { color: #5d564a; font: 9px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; }
+.inspector-title { color: var(--ink); font-size: 19px; font-weight: 750; letter-spacing: -.03em; margin: 4px 0 7px; }
+.inspector-title span { color: #6b6458; font: 10px var(--font-mono); font-weight: 400; }
+.inspector-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 9px; }
+.inspector-badges span { border: 1px solid #cfc7b8; padding: 3px 5px; color: #4b463d; border-radius: 2px; font: 9px var(--font-mono); }
+.side-badge.short { color: #9c3040; border-color: #d8aeb2 !important; }
+.side-badge.long { color: #22456d; border-color: #aab9ca !important; }
+.inspector-levels {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px 9px;
+  padding: 8px 0; border-top: 1px solid #d8d0c1; border-bottom: 1px solid #d8d0c1;
+}
+.inspector-levels div { display: flex; flex-direction: column; gap: 2px; }
+.inspector-levels span { color: #756d60; font: 8px var(--font-mono); }
+.inspector-levels b { color: var(--ink); font: 12px var(--font-mono); }
+.inspector-levels .negative { color: #a33a43; }
+.inspector-levels .positive { color: #274a6d; }
+.lifecycle { display: flex; flex-direction: column; gap: 4px; margin: 9px 0; }
+.lifecycle div { display: grid; grid-template-columns: 9px 1fr auto; align-items: center; gap: 5px; color: #8b8374; font: 9px var(--font-mono); }
+.lifecycle i { width: 6px; height: 6px; border-radius: 50%; border: 1px solid #aaa191; }
+.lifecycle .done { color: #22456d; }
+.lifecycle .done i { background: #4d7098; border-color: #4d7098; }
+.lifecycle em { font-style: normal; font-size: 8px; color: #9a9284; }
+.lifecycle-note { color: #7f7769; font: 8px var(--font-mono); line-height: 1.4; margin: -3px 0 7px; }
+.paper-note {
+  background: var(--paper-inset); border-left: 2px solid #4b719c; padding: 7px 8px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.paper-note b { font: 8px var(--font-mono); color: #314358; }
+.paper-note span { color: #4d493f; font-size: 10px; line-height: 1.45; }
+.inspector-empty { color: #5f5a4f; font-size: 11px; line-height: 1.55; }
+.inspector-empty.small { font-size: 9px; border-top: 1px solid #d8d0c1; padding-top: 7px; margin-bottom: 0; }
+.inspector-signal { border-top: 1px solid #d8d0c1; padding-top: 7px; }
+.inspector-signal b { display: block; font: 10px var(--font-mono); color: var(--ink); margin: 3px 0; }
+.inspector-signal p { font-size: 10px; line-height: 1.45; color: #5f5a4f; margin: 3px 0; }
+.inspector-signal small { font: 8px var(--font-mono); color: #8a8275; }
+.inspector-lavender { background: var(--note-lavender); color: #24202e; border-radius: 4px; padding: 11px 13px; }
+.inspector-lavender .inspector-kicker { color: #514867; }
+.inspector-lavender b { display: block; font: 10px var(--font-mono); margin: 4px 0; }
+.inspector-lavender p { font-size: 10px; line-height: 1.45; margin: 3px 0; }
+.inspector-lavender small { font: 8px var(--font-mono); color: #5a506d; }
+.inspector-green { background: var(--note-green); color: #17202b; border-radius: 4px; padding: 11px 13px; }
+.inspector-green .inspector-kicker { color: #3d4651; }
+.inspector-green div { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; font: 10px var(--font-mono); border-bottom: 1px solid rgba(23,32,43,.16); }
+.inspector-green div:last-of-type { border: 0; }
+.inspector-green small { display: block; margin-top: 5px; font: 8px var(--font-mono); line-height: 1.4; color: #3d4651; }
+
+/* ── 15. Position strip ───────────────────────────────────────────────── */
+.chart-position-strip { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+.position-strip-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);
+}
+.position-strip-head b { color: var(--text); font-weight: 700; }
+.position-strip-body { max-height: 240px; overflow-y: auto; }
+.position-strip-table td:first-child b { color: var(--text); font-weight: 650; }
+.position-strip-table td small { display: block; color: var(--text-muted); font-size: 9.5px; font-family: var(--font-mono); }
+.position-strip-table tbody tr { cursor: pointer; }
+
+/* ── 16. Status bar ───────────────────────────────────────────────────── */
+.workspace-statusbar {
+  display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-muted); font-family: var(--font-mono);
+}
+.workspace-statusbar b { color: var(--warn); }
+
+/* ── 17. Chart panel ──────────────────────────────────────────────────── */
+.chart-panel-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 9px 13px; border-bottom: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+.chart-panel-symbol { font-family: var(--font-mono); font-size: 13px; font-weight: 650; color: var(--text); letter-spacing: 0.02em; }
+.chart-panel-meta { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); }
+
+/*
+   23 Okt 2026 (Tahap 8): baris ticker live di header chart panel.
+   Angka_full (mark, 24h%, volume, funding, H/L) — semua dari feed futures.
+   Mark price dapat kelas flash-up/flash-down supaya arah tick terlihat.
+*/
+.panel-ticker {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  white-space: nowrap;
+}
+.panel-ticker > span { color: var(--text-muted); }
+.panel-ticker > span.positive { color: var(--up); }
+.panel-ticker > span.negative { color: var(--down); }
+.panel-ticker-mark {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+.panel-ticker-mark.positive { color: var(--up); }
+.panel-ticker-mark.negative { color: var(--down); }
+/* Flash arah: hijau saat mark naik, merah saat turun (kelas dari index.css). */
+.panel-ticker-mark.flash-up { animation: flashGreen 0.45s ease-out; color: var(--up); }
+.panel-ticker-mark.flash-down { animation: flashRed 0.45s ease-out; color: var(--down); }
+
+.chart-toolbar { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.chart-tool-button {
+  background: transparent; border: 1px solid transparent; color: var(--text-muted);
+  padding: 3px 8px; border-radius: var(--radius-sm);
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em;
+}
+.chart-tool-button:hover { color: var(--text); background: var(--surface-hover); border-color: var(--border); }
+.chart-tool-button.active { color: var(--accent); background: var(--accent-dim); border-color: var(--accent-border); }
+.chart-state-overlay {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: rgba(0, 0, 0, 0.66); backdrop-filter: blur(2px);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted);
+  font-family: var(--font-mono); z-index: 5;
+}
+
+/* ── 18. Agen ─────────────────────────────────────────────────────────── */
+/*
+   23 Okt 2026: sebelumnya `.agent-shell` = grid 2 kolom (1fr 320px). Tapi
+   AgentPage hanya punya SATU anak (agent-card), jadi kolom 320px kedua
+   SELALU kosong — dashboard terlihat terbelah dan separuh layar nganggur.
+   Operator minta dashboard agent fullscreen: satu kolom penuh.
+*/
+.agent-shell { display: flex; flex-direction: column; gap: 14px; }
+.agent-glow { position: relative; }
+.agent-glow::before {
+  content: ""; position: absolute; inset: -18px; pointer-events: none;
+  background: radial-gradient(ellipse at 18% 0%, rgba(224, 34, 44, 0.06), transparent 55%);
+}
+.agent-card {
+  display: flex; flex-direction: column; gap: 8px; padding: 13px 15px;
+  transition: border-color var(--t-fast), transform var(--t-fast);
+}
+.agent-card:hover { border-color: var(--border-strong); }
+.agent-head { display: flex; align-items: center; gap: 10px; }
+.agent-avatar {
+  width: 30px; height: 30px; flex: 0 0 30px; display: grid; place-items: center;
+  border-radius: 8px; background: var(--surface-raised); border: 1px solid var(--border-strong);
+  font-size: 12px; font-weight: 700; color: var(--accent);
+}
+.agent-name { font-size: 13px; font-weight: 650; color: var(--text); }
+.agent-id { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+.agent-summary { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
+/*
+   23 Okt 2026: `.agent-step` sebelumnya flex ROW, jadi `.agent-step-body`
+   jadi kolom kedua yang hanya dapat ~597px dari 1090px — tabel strategi
+   terpotong dan dashboard terlihat setengah kosong. Head harus DI ATAS body,
+   bukan samping.
+*/
+.agent-step { display: flex; flex-direction: column; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); }
+.agent-step-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; width: 100%; flex-wrap: wrap;
+  padding: 8px 11px; background: #111427;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 8.5px; font-weight: 700; letter-spacing: .08em;
+}
+.agent-step-body { width: 100%; min-width: 0; padding: 11px; }
+.agent-step-title { font-size: 12px; font-weight: 600; color: var(--text); }
+.agent-step-desc { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin-top: 2px; }
+.agent-progress { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+.agent-progress i { display: block; height: 100%; background: var(--accent); border-radius: 2px; transition: width var(--t-base); }
+
+/* ── 19. Utilitas aksesibilitas ──────────────────────────────────────── */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── 20. Print & kontras tinggi ──────────────────────────────────────── */
+@media (prefers-contrast: more) {
+  :root { --border: #3a4152; --text-muted: #9aa3b5; }
+}
+
+/* ── 21. Market Pulse (Bloomberg-style) ──────────────────────────────── */
+/* 23 Okt 2026: 4 kolom blok data — top gainers, top losers, top volume,
+   open posisi aktif. Baris live (mark update tiap 1s) berkedip hijau/merah
+   saat direction UP/DOWN. Stale = simbol yang belum ada SSE mark. */
+.pulse-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px;
+}
+@media (max-width: 1180px) { .pulse-grid { grid-template-columns: 1fr; } }
+
+.pulse-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.pulse-block > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.pulse-block > header b { color: var(--text); font-weight: 700; }
+.pulse-block > header span { color: var(--text-muted); font-weight: 500; }
+.pulse-block table { border-collapse: collapse; width: 100%; font-family: var(--font-mono); font-size: 11.5px; }
+.pulse-block thead th {
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.pulse-block tbody tr { cursor: pointer; transition: background .12s; }
+.pulse-block tbody tr:hover { background: var(--surface-hover); }
+/*
+   23 Okt 2026 (BUG): versi lama memberi animasi "tickIn" (hijau) ke SEMUA
+   baris live — baris yang price-nya turun pun berkedip hijau, jadi operator
+   salah baca arah. Flash sekarang HANYA datang dari kelas flash-up /
+   flash-down yang di-toggle JS berdasarkan arah mark price.
+*/
+.pulse-block tbody tr.stale { opacity: .55; }
+.pulse-block tbody tr.flash-up { animation: flashGreen .5s ease-out; }
+.pulse-block tbody tr.flash-down { animation: flashRed .5s ease-out; }
+.pulse-block tbody td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  color: var(--text);
+}
+.pulse-block tbody tr:last-child td { border-bottom: 0; }
+.pulse-block td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.pulse-block td small { display: block; color: var(--text-muted); font-size: 9px; margin-top: 1px; }
+.pulse-block .positive { color: var(--up); }
+.pulse-block .negative { color: var(--down); }
+
+/* Direction pill (UP/DOWN/FLAT) untuk ticker mark. */
+.dir-pill {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.dir-pill.up { color: var(--up); border-color: rgba(58, 168, 242, .35); background: rgba(58, 168, 242, .12); }
+.dir-pill.down { color: var(--down); border-color: rgba(242, 65, 74, .35); background: rgba(242, 65, 74, .12); }
+.dir-pill.flat { color: var(--text-muted); }
+
+/* Tick flash: saat baris baru saja di-update, kilat hijau/merah selama 400ms.
+   Class 'flash-up' / 'flash-down' di-toggle oleh JS saat liveTickers berubah. */
+@keyframes tickIn {
+  0%   { background: rgba(58, 168, 242, .22); }
+  100% { background: transparent; }
+}
+@keyframes tickDown {
+  0%   { background: rgba(242, 65, 74, .22); }
+  100% { background: transparent; }
+}
+.flash-up { animation: tickIn .45s ease-out; }
+.flash-down { animation: tickDown .45s ease-out; }
+
+/* Tabel utama (workspace-table) — tetap pakai style yang ada, tapi pulse sudah override. */
+

@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily ArtaTrade SQLite backup timer
+
+[Timer]
+OnCalendar=*-*-* 03:10:00
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

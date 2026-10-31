@@ -1,0 +1,199 @@
+/* =============================================================================
+   pro.css part 2 — Panel Analisis Aliran Pasar (23 Okt 2026, Tahap 8)
+   ============================================================================= */
+
+.analysis-panel {
+  display: flex; flex-direction: column; gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+
+.analysis-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  padding-bottom: 13px; border-bottom: 1px solid var(--border);
+}
+.analysis-title { font-size: 12.5px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text); }
+.analysis-sub { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-muted); margin-top: 3px; letter-spacing: 0.04em; }
+.analysis-head-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* ── Matriks perbandingan lintas jendela ─────────────────────────────── */
+.analysis-matrix-wrap { overflow-x: auto; }
+.analysis-matrix {
+  width: 100%; border-collapse: collapse;
+  font-size: 12.5px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.analysis-matrix thead th {
+  position: static;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border-strong);
+  white-space: nowrap;
+}
+.analysis-matrix thead th.num { text-align: right; }
+.analysis-matrix tbody th {
+  text-align: left; padding: 8px 14px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-muted); white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+  width: 1%;
+}
+.analysis-matrix tbody td {
+  text-align: right; padding: 8px 14px;
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.analysis-matrix tbody tr:last-child th, .analysis-matrix tbody tr:last-child td { border-bottom: none; }
+.analysis-matrix tbody tr:hover { background: var(--surface-hover); }
+.analysis-matrix td .window-flag, .analysis-matrix td .ok-flag { display: inline-block; }
+
+/* ── OI & funding ──────────────────────────────────────────────────────── */
+.analysis-oi {
+  padding: 12px 14px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.analysis-oi-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.analysis-oi-grid {
+  display: grid; gap: 12px; margin-top: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+.analysis-oi-grid dt {
+  font-size: 8.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 2px;
+}
+.analysis-oi-grid dd {
+  margin: 0; font-family: var(--font-mono); font-size: 19px; font-weight: 650;
+  color: var(--text); font-variant-numeric: tabular-nums;
+}
+.analysis-oi-grid dd.up { color: var(--up); }
+.analysis-oi-grid dd.down { color: var(--down); }
+.analysis-oi-grid dd.muted { color: var(--text-muted); font-size: 12px; font-weight: 500; }
+/* Nilai yang tidak ada: tampil redup & kecil supaya TIDAK seizedap data nyata. */
+.analysis-oi-grid dd.absent {
+  color: var(--text-muted); font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.08em; padding-top: 4px;
+}
+.analysis-oi-grid dd.sub { font-size: 10.5px; font-weight: 500; margin-top: 3px; line-height: 1.4; }
+
+.venue-sub { display: block; font-weight: 500; letter-spacing: 0.04em; margin-top: 2px; }
+
+/* Catatan penjelas (mis. jendela identik karena feed baru sebentar). */
+.analysis-note {
+  margin: 0; padding: 10px 13px;
+  background: var(--info-dim);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-left: 2px solid var(--info);
+  border-radius: var(--radius-md);
+  font-size: 12px; color: var(--text-secondary); line-height: 1.55;
+}
+
+/* ── Feed status chips ────────────────────────────────────────────────── */
+.analysis-feeds { display: flex; gap: 8px; flex-wrap: wrap; }
+.feed-chip {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 12px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.feed-chip i { font-style: normal; font-size: 13px; line-height: 1; }
+.feed-chip b { display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; }
+.feed-chip span { display: block; font-family: var(--font-mono); font-size: 9.5px; color: var(--text-muted); margin-top: 1px; }
+
+/* ── Kartu per jendela waktu ──────────────────────────────────────────── */
+.analysis-windows {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(228px, 1fr));
+}
+.window-card {
+  display: flex; flex-direction: column; gap: 7px;
+  padding: 13px 15px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--t-fast);
+}
+.window-card:hover { border-color: var(--border-strong); }
+.window-card.warming { border-style: dashed; }
+.window-card.empty { opacity: 0.7; }
+
+.window-label {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.window-label b { color: var(--text); font-weight: 700; }
+.window-flag {
+  font-size: 8.5px; letter-spacing: 0.08em; padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--info); background: var(--info-dim);
+}
+.ok-flag {
+  font-size: 8.5px; letter-spacing: 0.08em; padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--up); background: var(--up-dim);
+}
+.window-delta {
+  font-family: var(--font-mono); font-size: 22px; font-weight: 650;
+  line-height: 1.1; letter-spacing: -0.02em;
+}
+.window-caption { font-size: 8.5px; letter-spacing: 0.08em; color: var(--text-muted); margin-top: -4px; }
+
+/* Bar imbalance: beli agresif vs jual agresif. */
+.delta-bar {
+  display: flex; height: 6px; margin: 4px 0 3px;
+  border-radius: 3px; overflow: hidden; background: var(--border);
+}
+.delta-bar i { display: block; height: 100%; transition: width var(--t-base); }
+.delta-bar i.buy { background: var(--up); }
+.delta-bar i.sell { background: var(--down); }
+.delta-bar.warming { opacity: 0.5; }
+.delta-bar.empty { background: var(--border); }
+
+.window-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 12px; margin: 5px 0 0; }
+.window-stats > div { min-width: 0; }
+.window-stats dt {
+  font-size: 8.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 1px;
+}
+.window-stats dd {
+  margin: 0; font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; color: var(--text);
+}
+.window-stats dd.up { color: var(--up); }
+.window-stats dd.down { color: var(--down); }
+.window-stats dd.muted { color: var(--text-muted); font-size: 9.5px; letter-spacing: 0.04em; }
+.window-note { margin: 2px 0 0; font-size: 10.5px; color: var(--text-muted); line-height: 1.45; }
+
+/* ── Batasan ──────────────────────────────────────────────────────────── */
+.analysis-limits {
+  padding: 12px 14px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--warn);
+  border-radius: var(--radius-md);
+}
+.analysis-limits ul { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.analysis-limits li { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; }
+
+/* ── Panel status data (dipakai juga di halaman lain) ────────────────── */
+.data-status-grid { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.data-status-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.data-status-card i { font-style: normal; font-size: 15px; }
+.data-status-card b { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em; }
+.data-status-card span { display: block; font-size: 10.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }

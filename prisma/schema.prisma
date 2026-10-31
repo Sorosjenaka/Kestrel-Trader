@@ -1,0 +1,470 @@
+// Prisma schema ArtaTrade AI (Fase 0: Setting, EventLog, Symbol).
+// Tabel lain (LeverageHistory dkk) menyusul di fase berikutnya (Schema.md Bagian 1).
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model EventLog {
+  id        Int      @id @default(autoincrement())
+  type      String
+  severity  String   @default("info")
+  payload   String
+  dedupKey  String?  @unique
+  createdAt DateTime @default(now())
+
+  @@index([type, createdAt])
+  @@index([createdAt])
+}
+
+model Symbol {
+  symbol               String    @id
+  baseAsset            String
+  quoteAsset           String    @default("USDT")
+  contractType         String    @default("PERPETUAL")
+  underlyingType       String    @default("COIN")
+  status               String    @default("TRADING")
+  isBlacklisted        Boolean   @default(false)
+  blacklistReason      String?
+  volume24hUsd         Float     @default(0)
+  minNotional          Float     @default(5)
+  tickSize             Float     @default(0.01)
+  stepSize             Float     @default(0.001)
+  maxLeverage          Int?
+  maxLeverageUpdatedAt DateTime?
+  eligible             Boolean   @default(false)
+  eligibleReason       String?
+  updatedAt            DateTime  @updatedAt
+}
+
+model LeverageHistory {
+  id                  Int      @id @default(autoincrement())
+  symbol              String
+  maxLeverage         Int
+  previousMaxLeverage Int?
+  observedAt          DateTime
+  source              String
+  createdAt           DateTime @default(now())
+
+  @@index([symbol, observedAt])
+}
+
+model SetupCandidate {
+  id           Int      @id @default(autoincrement())
+  symbol       String
+  createdAt    DateTime @default(now())
+  mode         String
+  score        Int
+  regime       String
+  zoneScore    Int
+  triggerScore Int
+  trendScore   Int
+  knnProb      Float?
+  knnN         Int?
+  gatesPass    String
+  status       String   @default("WAIT")
+  rejectReason String?
+  // ── Mesin setup (T-5.15): strategi + POI/zona + level rencana ──
+  strategyId   String?
+  strategyName String?
+  entryType    String?
+  entryPrice   Float?
+  slPrice      Float?
+  tp1Price     Float?
+  tp2Price     Float?
+  zoneType     String?
+  zoneTop      Float?
+  zoneBottom   Float?
+  tfSummary    String?
+  planQuality  Int?
+  planNotes    String?
+
+  @@index([symbol, createdAt])
+  @@index([status, score])
+  @@index([strategyId, createdAt])
+}
+
+model BacktestRun {
+  id            Int             @id @default(autoincrement())
+  strategyId    String
+  strategyName  String
+  mode          String
+  fromDate      DateTime
+  toDate        DateTime
+  sampleCount   Int
+  winrate       Float
+  evUsd         Float
+  evR           Float
+  maxDdUsd      Float
+  feeModel      String
+  paramsVersion String          @default("v0.1.0-base")
+  status        String
+  failedReasons String?
+  distributionR String
+  createdAt     DateTime        @default(now())
+  trades        BacktestTrade[]
+
+  @@index([strategyId, mode])
+  @@index([status, createdAt])
+}
+
+model BacktestTrade {
+  id         Int         @id @default(autoincrement())
+  runId      Int
+  run        BacktestRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  symbol     String
+  direction  String
+  entryPrice Float
+  exitPrice  Float
+  entryAt    DateTime
+  exitAt     DateTime
+  rMultiple  Float
+  grossPnl   Float
+  netPnl     Float
+  feesUsd    Float
+  exitReason String
+  createdAt  DateTime    @default(now())
+
+  @@index([runId, symbol])
+  @@index([exitReason])
+}
+model Position {
+  id          Int         @id @default(autoincrement())
+  symbol      String
+  mode        String
+  side        String      // LONG / SHORT
+  entryPrice  Float
+  qty         Float
+  notional    Float
+  leverage    Int
+  marginUsd   Float
+  slPrice     Float
+  tp1Price    Float
+  tp2Price    Float
+  beMoved     Boolean     @default(false)
+  tp1FilledAt DateTime?
+  tp2FilledAt DateTime?
+  // TP1 65% yang sudah direalisasi: profit masuk equity segera, sisa 35% jalan terus.
+  realizedPnlUsd Float    @default(0)
+  tp1FillPrice   Float?
+  status      String      @default("OPEN") // OPEN / CLOSED
+  openedAt    DateTime    @default(now())
+  closedAt    DateTime?
+  closeReason String?     // TP2 / SL / BE / TIMEOUT / FUNDING / KILL
+  pnlUsd      Float?
+  pnlR        Float?
+  outlookText String      @default("")
+  // ── Mesin setup (T-5.15): strategi + POI + trailing stop ──
+  strategyId   String?
+  strategyName String?
+  entryType    String?
+  zoneType     String?
+  zoneTop      Float?
+  zoneBottom   Float?
+  trailPeak    Float?
+  trailActive  Boolean     @default(false)
+  /** Provenance data: LIVE_AI (bot) / MANUAL (operator) / DEMO (pipeline uji). */
+  source      String  @default("LIVE_AI")
+  /** Mode margin Binance Futures: CROSS (perintah operator) / ISOLATED. */
+  marginMode  String  @default("CROSS")
+  // Immutable entry basis and observed accounting (null means legacy/unverified).
+  originalQty Float?
+  originalSlPrice Float?
+  originalRiskUsd Float?
+  /** Budget risiko NET ($) yang dipakai sizing — denominator R ternormalisasi (29 Sep 2026). */
+  riskBudgetUsd Float?
+  entryFeeUsd Float?
+  entryFeeEstimated Boolean?
+  quantityStep Float?
+  priceTick Float?
+  mfePrice Float?
+  maePrice Float?
+  accountingVersion Int?
+  exitAccounting String?
+  /** T-01 (4 Okt 2026): snapshot atribut trigger & kondisi market saat entry (JSON teks, pencatatan). */
+  entryAttrs  String?
+  orders      OrderExec[]
+  trade       Trade?
+  decisionLogs DecisionLog[]
+  swingSignalLogs SwingSignalLog[]
+  directionBattles DirectionBattle[]
+
+  @@index([source])
+
+  @@index([status, symbol])
+  @@index([openedAt])
+}
+
+model OrderExec {
+  id             Int       @id @default(autoincrement())
+  positionId     Int?
+  position       Position? @relation(fields: [positionId], references: [id], onDelete: SetNull)
+  clientOrderId  String    @unique
+  binanceOrderId String?
+  symbol         String
+  type           String    // LIMIT / STOP_MARKET / TAKE_PROFIT_MARKET / MARKET
+  side           String    // BUY / SELL
+  price          Float
+  qty            Float
+  reduceOnly     Boolean   @default(false)
+  status         String    @default("NEW") // NEW / PARTIAL / FILLED / CANCELED / REJECTED
+  filledQty      Float?
+  feeEstimated   Boolean @default(true)
+  simulated      Boolean @default(false)
+  fillPrice      Float?
+  feeUsd         Float?
+  createdAt      DateTime  @default(now())
+  filledAt       DateTime?
+
+  @@index([clientOrderId])
+  @@index([status, createdAt])
+}
+
+model Trade {
+  id          Int             @id @default(autoincrement())
+  positionId  Int             @unique
+  position    Position        @relation(fields: [positionId], references: [id], onDelete: Cascade)
+  symbol      String
+  mode        String
+  side        String
+  riskUsd     Float           @default(1.0)
+  /** Budget risiko NET ($) saat entry; null = legacy tanpa catatan budget. */
+  riskBudgetUsd Float?
+  entryAvg    Float
+  exitAvg     Float
+  /** R basis jarak harga (audit lama). R ternormalisasi budget dihitung = pnlUsd/riskBudgetUsd. */
+  rMultiple   Float
+  pnlUsd      Float
+  feeUsd      Float
+  fundingUsd  Float           @default(0.0)
+  win         Boolean
+  mfeR        Float           @default(0.0)
+  maeR        Float           @default(0.0)
+  holdMinutes Int             @default(0)
+  createdAt   DateTime        @default(now())
+  strategyId  String?
+  zoneType    String?
+  /** Provenance: LIVE_AI / MANUAL / DEMO — DEMO tidak dihitung di history & equity. */
+  source      String?
+  accountingQuality String @default("LEGACY")
+  fundingVerified Boolean @default(false)
+  excursionsVerified Boolean @default(false)
+  /** T-01 (4 Okt 2026): salinan entryAttrs posisi — bertahan setelah history direset. */
+  entryAttrs  String?
+  learnings   LearningEntry[]
+
+  @@index([symbol, createdAt])
+  @@index([win])
+}
+
+model LearningEntry {
+  id        Int      @id @default(autoincrement())
+  // tradeId BOLEH NULL: perintah operator (25 Sep 2026) — evaluasi/pelajaran dari
+  // trade lama DIPERTAHANKAN walau baris Trade-nya dihapus (reset history).
+  tradeId   Int?
+  trade     Trade?   @relation(fields: [tradeId], references: [id], onDelete: SetNull)
+  causeCode String   // LOSS: CHOP_ENTRY / SL_TIGHT / STOP_HUNT / FAKEOUT_TRAP / GIVEBACK / MACRO_FLIP / LATE_ENTRY / FEE_DRAG / NEWS_SPIKE / LOSS_SL / LOSS_TREND_FLIP / LOSS_TIMEOUT / OTHER — WIN: TP2_PERFECT / TP1_DISCIPLINE / BE_SAVED / EDGE_HELD
+  /** Hasil akhir trade: LOSS_SL / LOSS_TREND_FLIP / LOSS_TIMEOUT / LOSS_OTHER / WIN_TP2 / WIN_TP1 / BE / WIN_OTHER / LOSS / WIN (backfill lama) / UNKNOWN. */
+  outcome   String   @default("UNKNOWN")
+  narrative String
+  /** Pelajaran 1 kalimat gaya trader profesional — dimakan kembali oleh judge saat entry. */
+  lesson    String?
+  /** Agen evaluator: post-mortem (Sesha) default; bisa diisi agen lain. */
+  agentId   String   @default("post-mortem")
+  proposal  String?  // JSON string
+  // ── SMB T-01 (9 Okt 2026): kesalahan EKSEKUSI/proses, terpisah dari causeCode pasar. ──
+  // SQLite tanpa enum native: nilai divalidasi allowlist EXECUTION_MISTAKES di TS.
+  executionMistake   String   @default("MISTAKE_NONE")
+  isExecutionMistake Boolean  @default(false)
+  planDeviationRatio Float?
+  mistakeNotes       String?
+  createdAt DateTime @default(now())
+
+  @@index([tradeId])
+  @@index([causeCode])
+  @@index([outcome])
+  @@index([executionMistake])
+}
+
+// SMB T-05 (9 Okt 2026): aturan If-Then playbook. status default PROPOSED —
+// aturan baru TIDAK PERNAH aktif otomatis; APPROVED hanya lewat keputusan operator.
+model PlaybookRule {
+  id               String   @id @default(cuid())
+  ruleText         String
+  triggerCondition String
+  actionStatement  String
+  source           String   @default("MANUAL") // MANUAL / DERIVED
+  status           String   @default("PROPOSED") // PROPOSED / APPROVED / REJECTED / ARCHIVED
+  appliedCount     Int      @default(0)
+  violatedCount    Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([status])
+}
+
+model ParameterVersion {
+  id            Int       @id @default(autoincrement())
+  version       String    @unique
+  params        String    // JSON string
+  status        String    @default("CANDIDATE") // CANDIDATE / TESTING / ACTIVE / REJECTED / ROLLED_BACK
+  backtestRunId Int?
+  activatedAt   DateTime?
+  rollbackAt    DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([status])
+}
+
+
+
+// Big Brain Tahap B1 (14 Okt 2026): memori keputusan. Satu baris per keputusan
+// judge (GO maupun NO-GO) — konteks SAAT ENTRY yang nanti di-join dengan hasil
+// Trade untuk kalibrasi (reliability curve, Brier score). TANPA angka uang;
+// hanya fitur keputusan. decision Kandidat ditolak juga di-log = data negatif.
+model DirectionBattle {
+  id                  Int       @id @default(autoincrement())
+  battleId            String    @unique
+  symbol              String
+  mode                String
+  proposedSide        String
+  trendSide           String?
+  winner              String?
+  status              String
+  longScore           Float
+  shortScore          Float
+  margin              Float
+  trendScore          Float?
+  regime              String?
+  adx                 Float?
+  choppiness          Float?
+  compositeScore      Float?
+  knnProb             Float?
+  macroAllowed        Boolean?
+  dataQuality         String
+  reasons             String    @default("[]")
+  inputSnapshot       String    @default("{}")
+  positionId          Int?
+  position            Position? @relation(fields: [positionId], references: [id], onDelete: SetNull)
+  outcomeStatus       String    @default("PENDING")
+  realizedPnlUsd      Float?
+  realizedR           Float?
+  closeReason         String?
+  directionCorrect    Boolean?
+  outcomeAt           DateTime?
+  createdAt           DateTime  @default(now())
+  votes               DirectionBattleVote[]
+
+  @@index([symbol, createdAt])
+  @@index([status, createdAt])
+  @@index([positionId])
+  @@index([outcomeStatus, createdAt])
+}
+
+model DirectionBattleVote {
+  id          Int             @id @default(autoincrement())
+  battleId    Int
+  battle      DirectionBattle @relation(fields: [battleId], references: [id], onDelete: Cascade)
+  agentId     String
+  side        String
+  stance      String
+  confidence  Float
+  reasoning   String
+  byLlm       Boolean
+  createdAt   DateTime        @default(now())
+
+  @@unique([battleId, agentId, side])
+  @@index([agentId, createdAt])
+}
+
+model DecisionLog {
+  id            Int      @id @default(autoincrement())
+  symbol        String
+  side          String   // LONG / SHORT
+  mode          String   // SCALP
+  strategyId    String?
+  decision      String   @default("NO_GO") // GO / NO_GO / SKIPPED
+  rejectReason  String?
+  // Fitur keputusan (semua nullable — fail-closed: yang hilang tetap di-null-kan, tanpa fabrikasi)
+  knnProb       Float?
+  knnN          Int?
+  drexProb      Float?   // noul entry_go 0..1
+  drexStrength  Float?   // skor setup_strength 0..4
+  compositeScore Float?
+  trendScore    Float?
+  regime        String?
+  er            Float?   // Efficiency Ratio (Tahap B2)
+  choppiness    Float?
+  adx           Float?
+  atrPct        Float?
+  pocDistanceBins Float? // jarak harga-POC dalam bin (Tahap B3)
+  oiChangePct     Float? // perubahan Open Interest % ~30 menit (Tahap B4)
+  betaBtc         Float? // beta simbol vs BTC, return log 5m (Tahap B4)
+  macroAllowed  Boolean?
+  cooldownAgeMs Int?
+  // Keterkaitan hasil (diisi belakangan saat posisi jadi trade)
+  positionId    Int?
+  position      Position? @relation(fields: [positionId], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now())
+
+  @@index([symbol, createdAt])
+  @@index([decision])
+  @@index([positionId])
+}
+
+// Ingatan jalur SWING (14 Okt 2026): setiap evaluasi sinyal swing yang BENAR-BENAR
+// ada sinyalnya (bar 1h tertutup menghasilkan setup) dicatat terstruktur — bahan
+// riset/analisis LLM Market Analyst dan kalibrasi funnel swing. Tick tanpa sinyal
+// TIDAK dicatat (anti-spam). Angka level selalu milik TS (Golden Rule #1).
+model SwingSignalLog {
+  id          Int      @id @default(autoincrement())
+  symbol      String
+  side        String   // LONG / SHORT
+  strategyId  String   // S-05 / S-03
+  decision    String   // ENTRY_OPENED / ENTRY_REJECTED / SKIP_ENTRY_GAP / SIGNAL_NO_PLAN / SIGNAL_BLOCKED
+  reason      String?  // pesan penolakan (CAP_FULL, ARM_REQUIRED, dsb.)
+  entryPrice  Float?
+  slPrice     Float?
+  tp1Price    Float?
+  rr          Float?
+  mode        String   @default("SWING")
+  positionId  Int?
+  position    Position? @relation(fields: [positionId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+
+  @@index([symbol, createdAt])
+  @@index([strategyId, createdAt])
+  @@index([decision])
+}
+
+// Big Brain — jurnal temuan riset (prinsip "findings/verdict" dari riset
+// hedge fund; 15 Okt 2026). SATU baris per eksperimen: hipotesis, bukti
+// (referensi BacktestRun/audit), verdict, dan keputusan operator.
+// Tujuan: riset tidak boleh hilang jadi "klaim tanpa bukti angka" lagi.
+model ResearchFinding {
+  id               Int       @id @default(autoincrement())
+  title            String
+  hypothesis       String
+  experimentType   String    // BACKTEST / OOS_VALIDATION / EVENT_REPLAY / LOOKAHEAD_AUDIT
+  runRefs          String    @default("[]") // JSON [{kind, id, hash?}]
+  metrics          String    @default("{}") // JSON ringkasan angka kunci
+  verdict          String    // SUPPORTIVE / REFUTED / INCONCLUSIVE
+  conclusion       String    @default("")
+  operatorDecision String    @default("PENDING") // PENDING / ADOPTED / REJECTED
+  decidedAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([verdict, createdAt])
+  @@index([operatorDecision])
+}

@@ -1,0 +1,21 @@
+{
+  "ts": "2026-09-23T20:37:43.610Z",
+  "passed": true,
+  "readyMs": 1077,
+  "health": {
+    "status": "ok",
+    "mode": "TERMINAL",
+    "version": "0.1.3",
+    "clock": {
+      "utc": "2026-09-23T20:37:43.601Z",
+      "driftMs": null
+    },
+    "keys": {
+      "binance": "SET",
+      "opencode": "SET"
+    },
+    "arm": false
+  },
+  "healthErr": "",
+  "bootLog": "{\"level\":40,\"time\":1790195863250,\"pid\":38620,\"hostname\":\"DESKTOP-VDG5CP8\",\"err\":\"fetch failed\",\"url\":\"https://fapi1.binance.com/fapi/v1/time\",\"msg\":\"sinkron jam Binance gagal (pool fallback resmi ada di FR-23)\"}\n{\"level\":30,\"time\":1790195863253,\"pid\":38620,\"hostname\":\"DESKTOP-VDG5CP8\",\"port\":8787,\"driftMs\":null,\"msg\":\"ArtaTrade server berjalan (ARM=OFF)\"}\n"
+}

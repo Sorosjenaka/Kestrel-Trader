@@ -1,0 +1,5 @@
+*.log
+*.out
+*.pid
+*_state.json
+__pycache__/
