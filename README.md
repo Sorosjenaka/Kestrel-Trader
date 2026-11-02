@@ -130,7 +130,9 @@ sehingga Anda dapat mengaudit perilakunya kapan saja.
 ## Arsitektur Sistem
 
 Dokumentasi arsitektur lengkap mengikuti standar **C4 model** (Konteks → Wadah →
-Komponen), tersedia dalam Bahasa Indonesia:
+Komponen), tersedia dalam Bahasa Indonesia. Semua diagram di bawah adalah
+screenshot dari **diagram interaktif React Flow** — buka menu **Diagram** di
+dashboard (`#/diagram`) untuk versi yang bisa digeser dan diperbesar:
 
 | Level | Diagram | Gambar |
 |---|---|---|
@@ -157,7 +159,8 @@ flowchart LR
     I -.-> C
 ```
 
-Diagram alur yang lebih rinci:
+Diagram alur yang lebih rinci (screenshot dari diagram interaktif React Flow di
+menu **Diagram** dashboard):
 
 | | |
 |---|---|

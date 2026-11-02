@@ -22,8 +22,11 @@ const SettingsHubPage = lazy(() => import("./pages/SettingsHubPage").then((m) =>
 // DISEMBUNYIKAN dari menu dan rute #/paper diarahkan ke Live (Hanya LIVE yang
 // tampil). Kode PaperDashboardPage TIDAK dihapus, hanya tidak ditautkan.
 const LiveLiveOnlyPage = lazy(() => import("./pages/LiveLiveOnlyPage").then((m) => ({ default: m.LiveLiveOnlyPage })));
+// 3 Nov 2026 — halaman diagram arsitektur/workflow interaktif (React Flow),
+// sumber gambar untuk dokumentasi publik.
+const DiagramFlowPage = lazy(() => import("./pages/DiagramFlowPage").then((m) => ({ default: m.DiagramFlowPage })));
 
-type TabId = "market" | "terminal" | "portfolio" | "agent" | "research" | "live" | "settings";
+type TabId = "market" | "terminal" | "portfolio" | "agent" | "research" | "live" | "diagram" | "settings";
 type Route = { tab: TabId; sub: string };
 
 const NAV: Array<{ id: Exclude<TabId, "settings">; label: string; shortLabel: string }> = [
@@ -33,6 +36,7 @@ const NAV: Array<{ id: Exclude<TabId, "settings">; label: string; shortLabel: st
   { id: "agent", label: "Agents", shortLabel: "Agents" },
   { id: "research", label: "Research", shortLabel: "Research" },
   { id: "live", label: "Live", shortLabel: "Live" },
+  { id: "diagram", label: "Diagram", shortLabel: "Diagram" },
 ];
 
 const ALIASES: Record<string, Route> = {
@@ -43,6 +47,9 @@ const ALIASES: Record<string, Route> = {
   screener: { tab: "market", sub: "screener" },
   heatmap: { tab: "market", sub: "heatmap" },
   terminal: { tab: "terminal", sub: "" },
+  diagram: { tab: "diagram", sub: "" },
+  arsitektur: { tab: "diagram", sub: "" },
+  workflow: { tab: "diagram", sub: "" },
   positions: { tab: "terminal", sub: "" },
   portfolio: { tab: "portfolio", sub: "" },
   history: { tab: "portfolio", sub: "history" },
@@ -264,6 +271,7 @@ export default function App() {
       case "agent": return <AgentPage />;
       case "research": return <ResearchPage sub={sub} onSub={(s: ResearchSub) => go("research", s)} />;
       case "live": return <LiveLiveOnlyPage />;
+      case "diagram": return <DiagramFlowPage />;
       case "settings": return <SettingsHubPage sub={sub} onSub={(s: SettingsSub) => go("settings", s)} />;
       default: return <MarketHubPage sub={sub} onSub={(s: MarketSub) => go("market", s)} />;
     }

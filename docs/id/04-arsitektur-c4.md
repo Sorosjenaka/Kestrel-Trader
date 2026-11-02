@@ -6,6 +6,10 @@ Wadah → Komponen**. Setiap tingkat menjawab pertanyaan yang berbeda: siapa yan
 memakai sistem, apa saja isinya, dan bagaimana satu pekerjaan mengalir di
 dalamnya.
 
+Semua gambar di dokumen ini adalah screenshot dari **diagram interaktif React
+Flow** yang tersedia di dashboard (menu **Diagram**, rute `#/diagram`) — di
+sana Anda dapat menggeser node, memperbesar, dan menelusuri tiap koneksi.
+
 ---
 
 ## Level 1 — Konteks Sistem
