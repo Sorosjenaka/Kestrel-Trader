@@ -27,7 +27,6 @@
 - [Instalasi Cepat](#instalasi-cepat)
 - [Struktur Proyek](#struktur-proyek)
 - [Teknologi](#teknologi)
-- [Pertanyaan Umum](#pertanyaan-umum)
 - [Disclaimer & Lisensi](#disclaimer--lisensi)
 
 ---
@@ -224,25 +223,6 @@ Kestrel-Trader/
 | Data pasar | Binance USDT-M Futures (REST + WebSocket) |
 | Penilaian AI | Integrasi penyedia LLM (fail-closed) |
 | Diagram | C4 model |
-
-## Pertanyaan Umum
-
-**Apakah aman untuk langsung dipakai dengan uang sungguhan?**
-Tidak — selalu mulai dengan mode simulasi. Pahami perilaku sistem, audit log
-keputusannya, lalu pertimbangkan pindah ke mode nyata dengan ukuran sekecil
-mungkin.
-
-**Apakah API key saya aman?**
-Ya. File `.env` tidak pernah masuk Git, nilai key tidak pernah dicatat ke log
-atau UI, dan template yang disertakan hanya berisi placeholder.
-
-**Apakah sistem bisa jalan sendiri 24/7?**
-Bisa — tersedia watchdog proses, backup terjadwal, dan penjaga rate-limit.
-Namun tetap disarankan melakukan pemeriksaan berkala sebagai operator.
-
-**Bagaimana sistem menolak kandidat yang buruk?**
-Melalui gerbang risiko deterministik dan panel penilai AI yang *fail-closed*.
-Setiap penolakan tercatat beserta alasannya di log keputusan.
 
 ## Disclaimer & Lisensi
 
