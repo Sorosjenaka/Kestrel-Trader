@@ -11,6 +11,7 @@ tanpa detail internal, tanpa parameter risiko, dan tanpa rahasia.
 | [01-ikhtisar-dan-fitur.md](01-ikhtisar-dan-fitur.md) | Apa ini, daftar fitur, dan cara kerja secara garis besar |
 | [02-alur-kerja-workflow.md](02-alur-kerja-workflow.md) | Struktur sistem + alur kerja lengkap (dengan diagram) |
 | [03-tutorial-pasang.md](03-tutorial-pasang.md) | Tutorial instalasi langkah demi langkah |
+| [04-arsitektur-c4.md](04-arsitektur-c4.md) | Arsitektur sistem model C4 (konteks → wadah → komponen) |
 
 ## Diagram (gambar)
 
