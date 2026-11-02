@@ -23,7 +23,7 @@ This document describes each subsystem: what it is, what it receives, what it pr
 
 ## 3. Scanner and signal engines
 
-**Scanner pool.** Runs a bounded number of symbol evaluations in parallel on a fixed cycle, with separate cadences for the scalp and swing modes. It produces a scan view: the candidates from the latest complete cycle plus cycle metrics. Downstream components read only completed cycles, so a partial scan cannot be traded.
+**Scanner pool.** Runs a bounded number of symbol evaluations in parallel on a fixed cycle, with dedicated cadences for different market horizons. It produces a scan view: the candidates from the latest complete cycle plus cycle metrics. Downstream components read only completed cycles, so a partial scan cannot be traded.
 
 **Signal engines.** Each candidate passes through several deterministic engines:
 
